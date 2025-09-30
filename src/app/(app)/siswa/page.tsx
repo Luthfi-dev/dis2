@@ -29,11 +29,12 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog"
-import React, { useState, useEffect, useMemo, useTransition } from 'react';
+import React, { useState, useEffect, useMemo, useTransition, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { getSiswa, deleteSiswa, importData, ImportResult } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { debounce } from 'lodash';
 
 function ActionMenu({ student, onDelete }: { student: Siswa, onDelete: (id: string) => void }) {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -224,21 +225,30 @@ export default function SiswaPage() {
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [isResultOpen, setIsResultOpen] = useState(false);
 
-  const fetchStudents = async () => {
-    setLoading(true);
-    const data = await getSiswa();
-    setStudents(data);
-    setLoading(false);
-  }
+  const debouncedFetchStudents = useCallback(
+    debounce((search: string) => {
+      setLoading(true);
+      getSiswa(search).then(data => {
+        setStudents(data);
+        setCurrentPage(1); // Reset to first page on new search
+        setLoading(false);
+      });
+    }, 500), // 500ms debounce delay
+    []
+  );
 
   useEffect(() => {
-    fetchStudents();
-  }, []);
+    debouncedFetchStudents(searchTerm);
+    return () => {
+      // Cancel the debounce on useEffect cleanup
+      debouncedFetchStudents.cancel();
+    };
+  }, [searchTerm, debouncedFetchStudents]);
 
   const handleImportComplete = (result: ImportResult) => {
     setImportResult(result);
     setIsResultOpen(true);
-    fetchStudents(); // Refresh list after import
+    debouncedFetchStudents(searchTerm); // Refresh list after import
   }
 
   const handleDeleteStudent = (id: string) => {
@@ -253,21 +263,13 @@ export default function SiswaPage() {
     });
   };
 
-  const filteredStudents = useMemo(() => {
-    if (!searchTerm) return students;
-    return students.filter(student => 
-      student.siswa_namaLengkap.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.siswa_nisn.includes(searchTerm)
-    );
-  }, [students, searchTerm]);
-
   // Pagination logic
-  const totalPages = Math.ceil(filteredStudents.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(students.length / ITEMS_PER_PAGE);
   const paginatedData = useMemo(() => {
       const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
       const endIndex = startIndex + ITEMS_PER_PAGE;
-      return filteredStudents.slice(startIndex, endIndex);
-  }, [filteredStudents, currentPage]);
+      return students.slice(startIndex, endIndex);
+  }, [students, currentPage]);
 
   const handlePageChange = (page: number) => {
       if(page >= 1 && page <= totalPages) {
@@ -342,7 +344,7 @@ export default function SiswaPage() {
           <div className="flex flex-col sm:flex-row justify-between gap-4">
             <div>
               <CardTitle>Data Siswa</CardTitle>
-              <CardDescription>Total {filteredStudents.length} siswa ditemukan.</CardDescription>
+              <CardDescription>Total {students.length} siswa ditemukan.</CardDescription>
             </div>
             <div className="relative w-full sm:max-w-xs">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -350,10 +352,7 @@ export default function SiswaPage() {
                 placeholder="Cari nama atau NISN..."
                 className="pl-9"
                 value={searchTerm}
-                onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1); // Reset to first page on search
-                }}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
@@ -443,3 +442,4 @@ export default function SiswaPage() {
     </div>
   );
 }
+

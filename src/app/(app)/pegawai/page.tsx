@@ -29,12 +29,13 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog"
-import React, { useState, useEffect, useMemo, useTransition } from 'react';
+import React, { useState, useEffect, useMemo, useTransition, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { getPegawai, deletePegawai, importData, ImportResult } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { debounce } from 'lodash';
 
 function ActionMenu({ pegawai, onDelete }: { pegawai: Pegawai, onDelete: (id: string) => void }) {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -226,21 +227,29 @@ export default function PegawaiPage() {
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [isResultOpen, setIsResultOpen] = useState(false);
 
-  const fetchPegawai = async () => {
-    setLoading(true);
-    const data = await getPegawai();
-    setPegawaiList(data);
-    setLoading(false);
-  }
+  const debouncedFetchPegawai = useCallback(
+    debounce((search: string) => {
+      setLoading(true);
+      getPegawai(search).then(data => {
+        setPegawaiList(data);
+        setCurrentPage(1);
+        setLoading(false);
+      });
+    }, 500),
+    []
+  );
 
   useEffect(() => {
-    fetchPegawai();
-  }, []);
+    debouncedFetchPegawai(searchTerm);
+    return () => {
+      debouncedFetchPegawai.cancel();
+    };
+  }, [searchTerm, debouncedFetchPegawai]);
 
   const handleImportComplete = (result: ImportResult) => {
     setImportResult(result);
     setIsResultOpen(true);
-    fetchPegawai(); // Refresh list after import
+    debouncedFetchPegawai(searchTerm); // Refresh list after import
   }
 
   const handleDeletePegawai = (id: string) => {
@@ -255,21 +264,13 @@ export default function PegawaiPage() {
     });
   };
 
-  const filteredPegawai = useMemo(() => {
-    if (!searchTerm) return pegawaiList;
-    return pegawaiList.filter(p => 
-      p.pegawai_nama?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (p.pegawai_nip && p.pegawai_nip.includes(searchTerm))
-    );
-  }, [pegawaiList, searchTerm]);
-
   // Pagination logic
-  const totalPages = Math.ceil(filteredPegawai.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(pegawaiList.length / ITEMS_PER_PAGE);
   const paginatedData = useMemo(() => {
       const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
       const endIndex = startIndex + ITEMS_PER_PAGE;
-      return filteredPegawai.slice(startIndex, endIndex);
-  }, [filteredPegawai, currentPage]);
+      return pegawaiList.slice(startIndex, endIndex);
+  }, [pegawaiList, currentPage]);
 
   const handlePageChange = (page: number) => {
       if(page >= 1 && page <= totalPages) {
@@ -344,7 +345,7 @@ export default function PegawaiPage() {
           <div className="flex flex-col sm:flex-row justify-between gap-4">
             <div>
               <CardTitle>Data Pegawai</CardTitle>
-              <CardDescription>Total {filteredPegawai.length} pegawai ditemukan.</CardDescription>
+              <CardDescription>Total {pegawaiList.length} pegawai ditemukan.</CardDescription>
             </div>
             <div className="relative w-full sm:max-w-xs">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -352,10 +353,7 @@ export default function PegawaiPage() {
                 placeholder="Cari nama atau NIP..."
                 className="pl-9"
                 value={searchTerm}
-                onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1); // Reset to first page on search
-                }}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
@@ -441,3 +439,4 @@ export default function PegawaiPage() {
     </div>
   );
 }
+

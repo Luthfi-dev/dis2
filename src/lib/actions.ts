@@ -32,10 +32,20 @@ function parseJsonFields(row: any) {
 // --- Public-facing Server Actions ---
 
 // SISWA ACTIONS
-export async function getSiswa(): Promise<Siswa[]> {
+export async function getSiswa(searchTerm?: string): Promise<Siswa[]> {
     const db = await pool.getConnection();
     try {
-        const [rows] = await db.query('SELECT * FROM siswa ORDER BY id DESC');
+        let query = 'SELECT * FROM siswa';
+        const params: string[] = [];
+
+        if (searchTerm) {
+            query += ' WHERE siswa_namaLengkap LIKE ? OR siswa_nisn LIKE ?';
+            params.push(`%${searchTerm}%`, `%${searchTerm}%`);
+        }
+
+        query += ' ORDER BY id DESC';
+
+        const [rows] = await db.query(query, params);
         return (rows as Siswa[]).map(parseJsonFields);
     } finally {
         db.release();
@@ -159,10 +169,20 @@ export async function submitStudentData(data: StudentFormData, studentId?: strin
 
 
 // PEGAWAI ACTIONS
-export async function getPegawai(): Promise<Pegawai[]> {
+export async function getPegawai(searchTerm?: string): Promise<Pegawai[]> {
     const db = await pool.getConnection();
     try {
-        const [rows] = await db.query('SELECT * FROM pegawai ORDER BY id DESC');
+        let query = 'SELECT * FROM pegawai';
+        const params: string[] = [];
+
+        if (searchTerm) {
+            query += ' WHERE pegawai_nama LIKE ? OR pegawai_nip LIKE ?';
+            params.push(`%${searchTerm}%`, `%${searchTerm}%`);
+        }
+
+        query += ' ORDER BY id DESC';
+
+        const [rows] = await db.query(query, params);
         return (rows as Pegawai[]).map(parseJsonFields);
     } finally {
         db.release();
@@ -450,3 +470,4 @@ const pegawaiHeaders = [
     { header: 'NRG', key: 'pegawai_nrg' },
     { header: 'Bidang Studi', key: 'pegawai_bidangStudi' },
 ];
+
