@@ -2,7 +2,7 @@
 'use server';
 import 'server-only';
 import pool from './db';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 export type User = {
   id: string;

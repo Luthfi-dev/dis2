@@ -19,24 +19,35 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     async function loadSettings() {
-      setLoading(true);
+      if (isMounted) {
+        setLoading(true);
+      }
       try {
         const storedSettings = localStorage.getItem(SETTINGS_STORAGE_KEY);
-        if (storedSettings) {
+        if (storedSettings && isMounted) {
           setSettingsState(JSON.parse(storedSettings));
         }
         
         const freshSettings = await getAppSettings();
-        setSettingsState(freshSettings);
-        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(freshSettings));
+        if (isMounted) {
+            setSettingsState(freshSettings);
+            localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(freshSettings));
+        }
       } catch (error) {
         console.error("Failed to load app settings", error);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+            setLoading(false);
+        }
       }
     }
     loadSettings();
+
+    return () => {
+        isMounted = false;
+    };
   }, []);
 
   const handleSetSettings = async (newSettings: AppSettings) => {

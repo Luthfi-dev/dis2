@@ -61,18 +61,26 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
   const [alamat, setAlamat] = useState({kabupaten: '', kecamatan: '', desa: ''});
 
   useEffect(() => {
+    let isMounted = true;
     const fetchPegawai = async () => {
+        setLoading(true);
         const result = await getPegawaiById(id);
-        if(result) {
-            setPegawai(result);
-            const kabName = await getKabupatenName(result.pegawai_alamatKabupaten);
-            const kecName = await getKecamatanName(result.pegawai_alamatKecamatan);
-            const desaName = await getDesaName(result.pegawai_alamatDesa);
-            setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
+        if(isMounted) {
+            if(result) {
+                setPegawai(result);
+                const kabName = await getKabupatenName(result.pegawai_alamatKabupaten);
+                const kecName = await getKecamatanName(result.pegawai_alamatKecamatan);
+                const desaName = await getDesaName(result.pegawai_alamatDesa);
+                setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
+            }
+            setLoading(false);
         }
-        setLoading(false);
     };
     fetchPegawai();
+
+    return () => {
+        isMounted = false;
+    };
   }, [id]);
 
 

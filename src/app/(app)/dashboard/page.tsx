@@ -22,19 +22,29 @@ export default function DashboardPage() {
   const [activities, setActivities] = useState<Activity[]>([]);
 
   useEffect(() => {
+    let isMounted = true;
     async function fetchData() {
         try {
-            const siswaData = await getSiswa();
-            const pegawaiData = await getPegawai();
+            const [siswaResult, pegawaiResult] = await Promise.all([
+                getSiswa('', 1, 1),
+                getPegawai('', 1, 1)
+            ]);
+            const activitiesData = getActivities();
             
-            setSiswaCount(siswaData.length);
-            setPegawaiCount(pegawaiData.length);
-            setActivities(getActivities());
+            if (isMounted) {
+                setSiswaCount(siswaResult.total);
+                setPegawaiCount(pegawaiResult.total);
+                setActivities(activitiesData);
+            }
         } catch (error) {
             console.error("Failed to load dashboard data from server", error);
         }
     }
     fetchData();
+
+    return () => {
+        isMounted = false;
+    };
   }, []);
 
   const chartData = [

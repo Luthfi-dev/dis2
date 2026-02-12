@@ -45,15 +45,30 @@ export default function UsersPage() {
   const [formData, setFormData] = useState<FormData>({ email: '', name: '', role: 'admin', status: 'active', password: '' });
   const { toast } = useToast();
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     const users = await getUsers();
     setUserList(users);
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
-    fetchUsers();
+    let isMounted = true;
+
+    const fetchUsersWithGuard = async () => {
+        setLoading(true);
+        const users = await getUsers();
+        if (isMounted) {
+            setUserList(users);
+            setLoading(false);
+        }
+    };
+    
+    fetchUsersWithGuard();
+
+    return () => {
+        isMounted = false;
+    };
   }, []);
 
   const handleAdd = () => {

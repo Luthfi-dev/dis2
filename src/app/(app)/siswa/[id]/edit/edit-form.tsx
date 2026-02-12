@@ -12,15 +12,23 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchStudent = async () => {
+      setLoading(true);
       const result = await getSiswaById(studentId);
-      if (result) {
-        setStudent(result);
+      if (isMounted) {
+        if (result) {
+          setStudent(result);
+        }
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchStudent();
+    
+    return () => {
+        isMounted = false;
+    };
   }, [studentId]);
 
   if (loading) {

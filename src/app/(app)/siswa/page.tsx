@@ -217,6 +217,7 @@ const ITEMS_PER_PAGE = 20;
 
 export default function SiswaPage() {
   const [students, setStudents] = useState<Siswa[]>([]);
+  const [totalStudents, setTotalStudents] = useState(0);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isDeleting, startDeleteTransition] = useTransition();
@@ -226,37 +227,43 @@ export default function SiswaPage() {
   const [isResultOpen, setIsResultOpen] = useState(false);
 
   const debouncedFetchStudents = useCallback(
-    debounce((search: string) => {
+    debounce((search: string, page: number) => {
       setLoading(true);
-      getSiswa(search).then(data => {
-        setStudents(data);
-        setCurrentPage(1); // Reset to first page on new search
+      getSiswa(search, page, ITEMS_PER_PAGE).then(result => {
+        setStudents(result.data);
+        setTotalStudents(result.total);
         setLoading(false);
       });
-    }, 500), // 500ms debounce delay
+    }, 500),
     []
   );
-
+  
   useEffect(() => {
-    debouncedFetchStudents(searchTerm);
+    debouncedFetchStudents(searchTerm, currentPage);
     return () => {
-      // Cancel the debounce on useEffect cleanup
       debouncedFetchStudents.cancel();
     };
-  }, [searchTerm, debouncedFetchStudents]);
+  }, [searchTerm, currentPage, debouncedFetchStudents]);
+
 
   const handleImportComplete = (result: ImportResult) => {
     setImportResult(result);
     setIsResultOpen(true);
-    debouncedFetchStudents(searchTerm); // Refresh list after import
+    // Refresh list after import by fetching page 1
+    if(currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      debouncedFetchStudents(searchTerm, 1);
+    }
   }
 
   const handleDeleteStudent = (id: string) => {
     startDeleteTransition(async () => {
       const result = await deleteSiswa(id);
       if (result.success) {
-        setStudents(prev => prev.filter(student => student.id !== id));
         toast({ title: 'Sukses!', description: result.message });
+        // Refresh data after deletion
+        debouncedFetchStudents(searchTerm, currentPage);
       } else {
         toast({ title: 'Gagal', description: result.message, variant: 'destructive' });
       }
@@ -264,12 +271,7 @@ export default function SiswaPage() {
   };
 
   // Pagination logic
-  const totalPages = Math.ceil(students.length / ITEMS_PER_PAGE);
-  const paginatedData = useMemo(() => {
-      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-      const endIndex = startIndex + ITEMS_PER_PAGE;
-      return students.slice(startIndex, endIndex);
-  }, [students, currentPage]);
+  const totalPages = Math.ceil(totalStudents / ITEMS_PER_PAGE);
 
   const handlePageChange = (page: number) => {
       if(page >= 1 && page <= totalPages) {
@@ -344,7 +346,7 @@ export default function SiswaPage() {
           <div className="flex flex-col sm:flex-row justify-between gap-4">
             <div>
               <CardTitle>Data Siswa</CardTitle>
-              <CardDescription>Total {students.length} siswa ditemukan.</CardDescription>
+              <CardDescription>Total {totalStudents} siswa ditemukan.</CardDescription>
             </div>
             <div className="relative w-full sm:max-w-xs">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -352,7 +354,10 @@ export default function SiswaPage() {
                 placeholder="Cari nama atau NISN..."
                 className="pl-9"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1); // Reset page to 1 on new search
+                }}
               />
             </div>
           </div>
@@ -376,8 +381,8 @@ export default function SiswaPage() {
                       <TableCell colSpan={5} className="py-4"><div className="h-4 bg-muted rounded animate-pulse"></div></TableCell>
                     </TableRow>
                   ))
-                ) : paginatedData.length > 0 ? (
-                  paginatedData.map((student) => (
+                ) : students.length > 0 ? (
+                  students.map((student) => (
                     <TableRow key={student.id} className={isDeleting ? 'opacity-50' : ''}>
                       <TableCell className="font-medium whitespace-nowrap">{student.siswa_namaLengkap}</TableCell>
                       <TableCell className="whitespace-nowrap">{student.siswa_nisn}</TableCell>
@@ -442,4 +447,3 @@ export default function SiswaPage() {
     </div>
   );
 }
-

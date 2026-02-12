@@ -32,21 +32,26 @@ function parseJsonFields(row: any) {
 // --- Public-facing Server Actions ---
 
 // SISWA ACTIONS
-export async function getSiswa(searchTerm?: string): Promise<Siswa[]> {
+export async function getSiswa(searchTerm: string, page: number, limit: number): Promise<{ data: Siswa[], total: number }> {
     const db = await pool.getConnection();
     try {
-        let query = 'SELECT * FROM siswa';
-        const params: string[] = [];
+        const offset = (page - 1) * limit;
+        let whereClause = '';
+        const params: (string | number)[] = [];
 
         if (searchTerm) {
-            query += ' WHERE siswa_namaLengkap LIKE ? OR siswa_nisn LIKE ?';
+            whereClause = ' WHERE siswa_namaLengkap LIKE ? OR siswa_nisn LIKE ?';
             params.push(`%${searchTerm}%`, `%${searchTerm}%`);
         }
 
-        query += ' ORDER BY id DESC';
+        const countQuery = `SELECT COUNT(*) as total FROM siswa${whereClause}`;
+        const [totalRows]: any = await db.query(countQuery, params);
+        const total = totalRows[0].total;
 
-        const [rows] = await db.query(query, params);
-        return (rows as Siswa[]).map(parseJsonFields);
+        const dataQuery = `SELECT * FROM siswa${whereClause} ORDER BY id DESC LIMIT ? OFFSET ?`;
+        const [rows] = await db.query(dataQuery, [...params, limit, offset]);
+        
+        return { data: (rows as Siswa[]).map(parseJsonFields), total };
     } finally {
         db.release();
     }
@@ -169,21 +174,26 @@ export async function submitStudentData(data: StudentFormData, studentId?: strin
 
 
 // PEGAWAI ACTIONS
-export async function getPegawai(searchTerm?: string): Promise<Pegawai[]> {
+export async function getPegawai(searchTerm: string, page: number, limit: number): Promise<{ data: Pegawai[], total: number }> {
     const db = await pool.getConnection();
     try {
-        let query = 'SELECT * FROM pegawai';
-        const params: string[] = [];
+        const offset = (page - 1) * limit;
+        let whereClause = '';
+        const params: (string | number)[] = [];
 
         if (searchTerm) {
-            query += ' WHERE pegawai_nama LIKE ? OR pegawai_nip LIKE ?';
+            whereClause = ' WHERE pegawai_nama LIKE ? OR pegawai_nip LIKE ?';
             params.push(`%${searchTerm}%`, `%${searchTerm}%`);
         }
+        
+        const countQuery = `SELECT COUNT(*) as total FROM pegawai${whereClause}`;
+        const [totalRows]: any = await db.query(countQuery, params);
+        const total = totalRows[0].total;
 
-        query += ' ORDER BY id DESC';
+        const dataQuery = `SELECT * FROM pegawai${whereClause} ORDER BY id DESC LIMIT ? OFFSET ?`;
+        const [rows] = await db.query(dataQuery, [...params, limit, offset]);
 
-        const [rows] = await db.query(query, params);
-        return (rows as Pegawai[]).map(parseJsonFields);
+        return { data: (rows as Pegawai[]).map(parseJsonFields), total };
     } finally {
         db.release();
     }

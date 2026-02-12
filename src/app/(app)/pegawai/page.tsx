@@ -219,6 +219,7 @@ const ITEMS_PER_PAGE = 20;
 
 export default function PegawaiPage() {
   const [pegawaiList, setPegawaiList] = useState<Pegawai[]>([]);
+  const [totalPegawai, setTotalPegawai] = useState(0);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isDeleting, startDeleteTransition] = useTransition();
@@ -228,11 +229,11 @@ export default function PegawaiPage() {
   const [isResultOpen, setIsResultOpen] = useState(false);
 
   const debouncedFetchPegawai = useCallback(
-    debounce((search: string) => {
+    debounce((search: string, page: number) => {
       setLoading(true);
-      getPegawai(search).then(data => {
-        setPegawaiList(data);
-        setCurrentPage(1);
+      getPegawai(search, page, ITEMS_PER_PAGE).then(result => {
+        setPegawaiList(result.data);
+        setTotalPegawai(result.total);
         setLoading(false);
       });
     }, 500),
@@ -240,24 +241,28 @@ export default function PegawaiPage() {
   );
 
   useEffect(() => {
-    debouncedFetchPegawai(searchTerm);
+    debouncedFetchPegawai(searchTerm, currentPage);
     return () => {
       debouncedFetchPegawai.cancel();
     };
-  }, [searchTerm, debouncedFetchPegawai]);
+  }, [searchTerm, currentPage, debouncedFetchPegawai]);
 
   const handleImportComplete = (result: ImportResult) => {
     setImportResult(result);
     setIsResultOpen(true);
-    debouncedFetchPegawai(searchTerm); // Refresh list after import
+    if(currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      debouncedFetchPegawai(searchTerm, 1);
+    }
   }
 
   const handleDeletePegawai = (id: string) => {
     startDeleteTransition(async () => {
       const result = await deletePegawai(id);
       if (result.success) {
-        setPegawaiList(prev => prev.filter(p => p.id !== id));
         toast({ title: 'Sukses!', description: result.message });
+        debouncedFetchPegawai(searchTerm, currentPage);
       } else {
         toast({ title: 'Gagal', description: result.message, variant: 'destructive' });
       }
@@ -265,12 +270,7 @@ export default function PegawaiPage() {
   };
 
   // Pagination logic
-  const totalPages = Math.ceil(pegawaiList.length / ITEMS_PER_PAGE);
-  const paginatedData = useMemo(() => {
-      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-      const endIndex = startIndex + ITEMS_PER_PAGE;
-      return pegawaiList.slice(startIndex, endIndex);
-  }, [pegawaiList, currentPage]);
+  const totalPages = Math.ceil(totalPegawai / ITEMS_PER_PAGE);
 
   const handlePageChange = (page: number) => {
       if(page >= 1 && page <= totalPages) {
@@ -345,7 +345,7 @@ export default function PegawaiPage() {
           <div className="flex flex-col sm:flex-row justify-between gap-4">
             <div>
               <CardTitle>Data Pegawai</CardTitle>
-              <CardDescription>Total {pegawaiList.length} pegawai ditemukan.</CardDescription>
+              <CardDescription>Total {totalPegawai} pegawai ditemukan.</CardDescription>
             </div>
             <div className="relative w-full sm:max-w-xs">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -353,7 +353,10 @@ export default function PegawaiPage() {
                 placeholder="Cari nama atau NIP..."
                 className="pl-9"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                }}
               />
             </div>
           </div>
@@ -377,8 +380,8 @@ export default function PegawaiPage() {
                       <TableCell colSpan={5} className="py-4"><div className="h-4 bg-muted rounded animate-pulse"></div></TableCell>
                     </TableRow>
                   ))
-                ) : paginatedData.length > 0 ? (
-                  paginatedData.map((pegawai) => (
+                ) : pegawaiList.length > 0 ? (
+                  pegawaiList.map((pegawai) => (
                     <TableRow key={pegawai.id} className={isDeleting ? 'opacity-50' : ''}>
                       <TableCell className="font-medium whitespace-nowrap">{pegawai.pegawai_nama}</TableCell>
                       <TableCell className="whitespace-nowrap">{pegawai.pegawai_nip || '-'}</TableCell>
@@ -439,4 +442,3 @@ export default function PegawaiPage() {
     </div>
   );
 }
-
