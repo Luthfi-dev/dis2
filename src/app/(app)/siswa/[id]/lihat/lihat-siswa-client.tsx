@@ -6,13 +6,14 @@ import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { FilePen, ArrowLeft, Building, User, Calendar, Mail, Phone, MapPin, Droplet, Stethoscope, BookOpen, File as FileIcon, Image as ImageIcon, Users, Languages, GraduationCap, School, HeartHandshake, Home, Briefcase, FileText } from 'lucide-react';
+import { FilePen, ArrowLeft, Building, User, Calendar, Mail, Phone, MapPin, Droplet, Stethoscope, BookOpen, File as FileIcon, Image as ImageIcon, Users, Languages, GraduationCap, School, HeartHandshake, Home, Briefcase, FileText, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import { getDesaName, getKecamatanName, getKabupatenName, getProvinceName } from '@/lib/wilayah';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
 
 function DetailItem({ label, value, icon }: { label: string; value: React.ReactNode; icon: React.ElementType }) {
   const Icon = icon;
@@ -53,30 +54,51 @@ export function LihatSiswaClient({ id }: { id: string }) {
     const [loading, setLoading] = useState(true);
     const [alamatKk, setAlamatKk] = useState({provinsi: '', kabupaten: '', kecamatan: '', desa: ''});
     const [domisili, setDomisili] = useState({provinsi: '', kabupaten: '', kecamatan: '', desa: ''});
+    const [error, setError] = useState<string | null>(null);
+    const { toast } = useToast();
 
     useEffect(() => {
         let isMounted = true;
         const fetchStudent = async () => {
             setLoading(true);
-            const result = await getSiswaById(id);
-            if (isMounted) {
-                if (result) {
-                    setStudent(result);
-                    // Fetch wilayah names
-                    const [kkProv, kkKab, kkKec, kkDes, domProv, domKab, domKec, domDes] = await Promise.all([
-                        getProvinceName(result.siswa_alamatKkProvinsi),
-                        getKabupatenName(result.siswa_alamatKkKabupaten),
-                        getKecamatanName(result.siswa_alamatKkKecamatan),
-                        getDesaName(result.siswa_alamatKkDesa),
-                        getProvinceName(result.siswa_domisiliProvinsi),
-                        getKabupatenName(result.siswa_domisiliKabupaten),
-                        getKecamatanName(result.siswa_domisiliKecamatan),
-                        getDesaName(result.siswa_domisiliDesa),
-                    ]);
-                    setAlamatKk({provinsi: kkProv, kabupaten: kkKab, kecamatan: kkKec, desa: kkDes});
-                    setDomisili({provinsi: domProv, kabupaten: domKab, kecamatan: domKec, desa: domDes});
+            setError(null);
+            try {
+                const result = await getSiswaById(id);
+                if (isMounted) {
+                    if (result) {
+                        setStudent(result);
+                        // Fetch wilayah names
+                        const [kkProv, kkKab, kkKec, kkDes, domProv, domKab, domKec, domDes] = await Promise.all([
+                            getProvinceName(result.siswa_alamatKkProvinsi),
+                            getKabupatenName(result.siswa_alamatKkKabupaten),
+                            getKecamatanName(result.siswa_alamatKkKecamatan),
+                            getDesaName(result.siswa_alamatKkDesa),
+                            getProvinceName(result.siswa_domisiliProvinsi),
+                            getKabupatenName(result.siswa_domisiliKabupaten),
+                            getKecamatanName(result.siswa_domisiliKecamatan),
+                            getDesaName(result.siswa_domisiliDesa),
+                        ]);
+                        setAlamatKk({provinsi: kkProv, kabupaten: kkKab, kecamatan: kkKec, desa: kkDes});
+                        setDomisili({provinsi: domProv, kabupaten: domKab, kecamatan: domKec, desa: domDes});
+                    } else {
+                        setError("Data siswa tidak ditemukan.");
+                    }
                 }
-                setLoading(false);
+            } catch (err: any) {
+                if (isMounted) {
+                    console.error("Fetch student error:", err);
+                    const errorMessage = "Gagal memuat data. Tidak dapat terhubung ke server database.";
+                    setError(errorMessage);
+                    toast({
+                        title: "Koneksi Gagal",
+                        description: err.message || "Terjadi kesalahan pada server.",
+                        variant: "destructive"
+                    });
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         };
         fetchStudent();
@@ -84,12 +106,34 @@ export function LihatSiswaClient({ id }: { id: string }) {
         return () => {
             isMounted = false;
         };
-    }, [id]);
+    }, [id, toast]);
 
     const formatDate = (dateString?: string | Date) => {
         if (!dateString) return '-';
-        return new Date(dateString).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+        // Handle both Date object and string
+        const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+        // Check if date is valid
+        if (isNaN(date.getTime())) return '-';
+        // Add timezone offset to counteract UTC conversion issues before formatting
+        const adjustedDate = new Date(date.valueOf() + date.getTimezoneOffset() * 60 * 1000);
+        return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(adjustedDate);
     }
+    
+  if (error) {
+    return (
+        <div className="max-w-4xl mx-auto flex flex-col items-center justify-center text-center p-8">
+            <AlertCircle className="w-16 h-16 text-destructive mb-4" />
+            <h2 className="text-2xl font-bold text-destructive">Gagal Memuat Data</h2>
+            <p className="text-muted-foreground mt-2 mb-6">{error}</p>
+            <Button asChild>
+                <Link href="/siswa">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Kembali ke Daftar
+                </Link>
+            </Button>
+        </div>
+    )
+  }
 
   if (loading) {
     return <div className="max-w-4xl mx-auto space-y-6">

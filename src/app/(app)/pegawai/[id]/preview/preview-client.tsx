@@ -5,7 +5,7 @@ import { Pegawai } from '@/lib/pegawai-data';
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowLeft, Printer, User, Calendar, MapPin, Briefcase, Home, Users, HeartHandshake, School, GraduationCap, FileText, CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowLeft, Printer, User, Calendar, MapPin, Briefcase, Home, Users, HeartHandshake, School, GraduationCap, FileText, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { getDesaName, getKecamatanName, getKabupatenName } from '@/lib/wilayah';
+import { useToast } from '@/hooks/use-toast';
 
 function InfoRow({ label, value, icon, className }: { label: string, value?: React.ReactNode, icon?: React.ElementType, className?: string }) {
     const Icon = icon;
@@ -59,21 +60,42 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
   const [pegawai, setPegawai] = useState<Pegawai | null>(null);
   const [loading, setLoading] = useState(true);
   const [alamat, setAlamat] = useState({kabupaten: '', kecamatan: '', desa: ''});
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     let isMounted = true;
     const fetchPegawai = async () => {
         setLoading(true);
-        const result = await getPegawaiById(id);
-        if(isMounted) {
-            if(result) {
-                setPegawai(result);
-                const kabName = await getKabupatenName(result.pegawai_alamatKabupaten);
-                const kecName = await getKecamatanName(result.pegawai_alamatKecamatan);
-                const desaName = await getDesaName(result.pegawai_alamatDesa);
-                setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
+        setError(null);
+        try {
+            const result = await getPegawaiById(id);
+            if(isMounted) {
+                if(result) {
+                    setPegawai(result);
+                    const kabName = await getKabupatenName(result.pegawai_alamatKabupaten);
+                    const kecName = await getKecamatanName(result.pegawai_alamatKecamatan);
+                    const desaName = await getDesaName(result.pegawai_alamatDesa);
+                    setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
+                } else {
+                    setError("Data pegawai tidak ditemukan.");
+                }
             }
-            setLoading(false);
+        } catch(err: any) {
+             if (isMounted) {
+                console.error("Fetch pegawai error:", err);
+                const errorMessage = "Gagal memuat data. Tidak dapat terhubung ke server database.";
+                setError(errorMessage);
+                toast({
+                    title: "Koneksi Gagal",
+                    description: err.message || "Terjadi kesalahan pada server.",
+                    variant: "destructive"
+                });
+            }
+        } finally {
+             if (isMounted) {
+                setLoading(false);
+            }
         }
     };
     fetchPegawai();
@@ -81,8 +103,25 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
     return () => {
         isMounted = false;
     };
-  }, [id]);
+  }, [id, toast]);
 
+  if (error) {
+    return (
+        <div className="bg-gray-100 dark:bg-gray-900 p-4 md:p-8 print:bg-white">
+            <div className="max-w-4xl mx-auto bg-white dark:bg-card rounded-xl shadow-2xl p-8 flex flex-col items-center justify-center text-center">
+                <AlertCircle className="w-16 h-16 text-destructive mb-4" />
+                <h2 className="text-2xl font-bold text-destructive">Gagal Memuat Preview</h2>
+                <p className="text-muted-foreground mt-2 mb-6">{error}</p>
+                <Button asChild variant="outline" className="print:hidden">
+                    <Link href="/pegawai">
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Kembali ke Daftar
+                    </Link>
+                </Button>
+            </div>
+        </div>
+    )
+  }
 
   if (loading) {
       return (
@@ -104,7 +143,13 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
 
   const formatDate = (dateString?: string | Date) => {
       if (!dateString) return '-';
-      return new Date(dateString).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+      // Handle both Date object and string
+      const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+      // Check if date is valid
+      if (isNaN(date.getTime())) return '-';
+      // Add timezone offset to counteract UTC conversion issues before formatting
+      const adjustedDate = new Date(date.valueOf() + date.getTimezoneOffset() * 60 * 1000);
+      return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(adjustedDate);
   }
   
   const pegawaiStatus = pegawai.status === 'Lengkap';

@@ -6,13 +6,14 @@ import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { FilePen, ArrowLeft, Building, User, Calendar, Mail, Phone, MapPin, Droplet, Stethoscope, BookOpen, File as FileIcon, Image as ImageIcon, Users, Languages, GraduationCap, School, HeartHandshake, Home, Briefcase, FileText } from 'lucide-react';
+import { FilePen, ArrowLeft, Building, User, Calendar, Mail, Phone, MapPin, Droplet, Stethoscope, BookOpen, File as FileIcon, Image as ImageIcon, Users, Languages, GraduationCap, School, HeartHandshake, Home, Briefcase, FileText, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import { Separator } from '@/components/ui/separator';
 import { getDesaName, getKecamatanName, getKabupatenName } from '@/lib/wilayah';
+import { useToast } from '@/hooks/use-toast';
 
 
 function DetailItem({ label, value, icon }: { label: string; value: React.ReactNode; icon: React.ElementType }) {
@@ -80,23 +81,44 @@ export function LihatPegawaiClient({ id }: { id: string }) {
     const [pegawai, setPegawai] = useState<Pegawai | null>(null);
     const [loading, setLoading] = useState(true);
     const [alamat, setAlamat] = useState({kabupaten: '', kecamatan: '', desa: ''});
+    const [error, setError] = useState<string | null>(null);
+    const { toast } = useToast();
 
 
     useEffect(() => {
         let isMounted = true;
         const fetchPegawai = async () => {
             setLoading(true);
-            const result = await getPegawaiById(id);
-            if(isMounted) {
-                if(result) {
-                    setPegawai(result);
-                    // Fetch wilayah names
-                    const kabName = await getKabupatenName(result.pegawai_alamatKabupaten);
-                    const kecName = await getKecamatanName(result.pegawai_alamatKecamatan);
-                    const desaName = await getDesaName(result.pegawai_alamatDesa);
-                    setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
+            setError(null);
+            try {
+                const result = await getPegawaiById(id);
+                if(isMounted) {
+                    if(result) {
+                        setPegawai(result);
+                        // Fetch wilayah names
+                        const kabName = await getKabupatenName(result.pegawai_alamatKabupaten);
+                        const kecName = await getKecamatanName(result.pegawai_alamatKecamatan);
+                        const desaName = await getDesaName(result.pegawai_alamatDesa);
+                        setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
+                    } else {
+                        setError("Data pegawai tidak ditemukan.");
+                    }
                 }
-                setLoading(false);
+            } catch(err: any) {
+                if (isMounted) {
+                    console.error("Fetch pegawai error:", err);
+                    const errorMessage = "Gagal memuat data. Tidak dapat terhubung ke server database.";
+                    setError(errorMessage);
+                    toast({
+                        title: "Koneksi Gagal",
+                        description: err.message || "Terjadi kesalahan pada server.",
+                        variant: "destructive"
+                    });
+                }
+            } finally {
+                 if (isMounted) {
+                    setLoading(false);
+                }
             }
         };
         fetchPegawai();
@@ -104,12 +126,34 @@ export function LihatPegawaiClient({ id }: { id: string }) {
         return () => {
             isMounted = false;
         };
-    }, [id]);
+    }, [id, toast]);
 
     const formatDate = (dateString?: string | Date) => {
         if (!dateString) return '-';
-        return new Date(dateString).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+        // Handle both Date object and string
+        const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+        // Check if date is valid
+        if (isNaN(date.getTime())) return '-';
+        // Add timezone offset to counteract UTC conversion issues before formatting
+        const adjustedDate = new Date(date.valueOf() + date.getTimezoneOffset() * 60 * 1000);
+        return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(adjustedDate);
     }
+  
+  if (error) {
+    return (
+        <div className="max-w-4xl mx-auto flex flex-col items-center justify-center text-center p-8">
+            <AlertCircle className="w-16 h-16 text-destructive mb-4" />
+            <h2 className="text-2xl font-bold text-destructive">Gagal Memuat Data</h2>
+            <p className="text-muted-foreground mt-2 mb-6">{error}</p>
+            <Button asChild>
+                <Link href="/pegawai">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Kembali ke Daftar
+                </Link>
+            </Button>
+        </div>
+    )
+  }
 
   if (loading) {
     return <div className="max-w-4xl mx-auto space-y-6">

@@ -6,21 +6,46 @@ import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Pegawai } from '@/lib/pegawai-data';
+import { useToast } from '@/hooks/use-toast';
+import { AlertCircle, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export function EditPegawaiForm({ pegawaiId }: { pegawaiId: string }) {
   const [pegawai, setPegawai] = useState<Pegawai | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     let isMounted = true;
     const fetchPegawai = async () => {
       setLoading(true);
-      const result = await getPegawaiById(pegawaiId);
-      if (isMounted) {
-        if (result) {
-          setPegawai(result);
+      setError(null);
+      try {
+        const result = await getPegawaiById(pegawaiId);
+        if (isMounted) {
+          if (result) {
+            setPegawai(result);
+          } else {
+            setError("Data pegawai tidak ditemukan.");
+          }
         }
-        setLoading(false);
+      } catch (err: any) {
+        if (isMounted) {
+          console.error("Fetch pegawai error:", err);
+          const errorMessage = "Gagal memuat data. Tidak dapat terhubung ke server database.";
+          setError(errorMessage);
+          toast({
+              title: "Koneksi Gagal",
+              description: err.message || "Terjadi kesalahan pada server.",
+              variant: "destructive"
+          });
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -29,7 +54,23 @@ export function EditPegawaiForm({ pegawaiId }: { pegawaiId: string }) {
     return () => {
       isMounted = false;
     };
-  }, [pegawaiId]);
+  }, [pegawaiId, toast]);
+  
+  if (error) {
+    return (
+        <div className="max-w-4xl mx-auto flex flex-col items-center justify-center text-center p-8">
+            <AlertCircle className="w-16 h-16 text-destructive mb-4" />
+            <h2 className="text-2xl font-bold text-destructive">Gagal Memuat Formulir</h2>
+            <p className="text-muted-foreground mt-2 mb-6">{error}</p>
+            <Button asChild>
+                <Link href="/pegawai">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Kembali ke Daftar
+                </Link>
+            </Button>
+        </div>
+    )
+  }
 
   if (loading) {
     return (

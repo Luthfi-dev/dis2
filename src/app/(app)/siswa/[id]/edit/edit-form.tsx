@@ -6,21 +6,46 @@ import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Siswa } from '@/lib/data';
+import { useToast } from '@/hooks/use-toast';
+import { AlertCircle, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export function EditStudentForm({ studentId }: { studentId: string }) {
   const [student, setStudent] = useState<Siswa | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     let isMounted = true;
     const fetchStudent = async () => {
       setLoading(true);
-      const result = await getSiswaById(studentId);
-      if (isMounted) {
-        if (result) {
-          setStudent(result);
+      setError(null);
+      try {
+        const result = await getSiswaById(studentId);
+        if (isMounted) {
+          if (result) {
+            setStudent(result);
+          } else {
+            setError("Data siswa tidak ditemukan.");
+          }
         }
-        setLoading(false);
+      } catch (err: any) {
+        if (isMounted) {
+          console.error("Fetch student error:", err);
+          const errorMessage = "Gagal memuat data. Tidak dapat terhubung ke server database.";
+          setError(errorMessage);
+          toast({
+              title: "Koneksi Gagal",
+              description: err.message || "Terjadi kesalahan pada server.",
+              variant: "destructive"
+          });
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -29,7 +54,23 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
     return () => {
         isMounted = false;
     };
-  }, [studentId]);
+  }, [studentId, toast]);
+
+  if (error) {
+    return (
+        <div className="max-w-4xl mx-auto flex flex-col items-center justify-center text-center p-8">
+            <AlertCircle className="w-16 h-16 text-destructive mb-4" />
+            <h2 className="text-2xl font-bold text-destructive">Gagal Memuat Formulir</h2>
+            <p className="text-muted-foreground mt-2 mb-6">{error}</p>
+            <Button asChild>
+                <Link href="/siswa">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Kembali ke Daftar
+                </Link>
+            </Button>
+        </div>
+    )
+  }
 
   if (loading) {
     return (
@@ -44,6 +85,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
   }
 
   if (!student) {
+    // This case should be handled by the error state, but as a fallback:
     notFound();
   }
   

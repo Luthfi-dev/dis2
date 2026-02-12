@@ -1,12 +1,12 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, PlusCircle, FilePen, Trash2, Loader2 } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, FilePen, Trash2, Loader2, AlertCircle } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,6 +39,7 @@ type FormData = Omit<User, 'id'> & { id?: string; password?: string };
 export default function UsersPage() {
   const [userList, setUserList] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -47,29 +48,27 @@ export default function UsersPage() {
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
-    const users = await getUsers();
-    setUserList(users);
-    setLoading(false);
-  }, []);
+    setError(null);
+    try {
+        const users = await getUsers();
+        setUserList(users);
+    } catch (err: any) {
+        console.error("Failed to fetch users:", err);
+        setError(`Gagal memuat data pengguna. Kesalahan: ${err.message}`);
+        toast({
+          title: "Koneksi Database Gagal",
+          description: "Tidak dapat terhubung ke server. Silakan coba lagi nanti.",
+          variant: "destructive"
+        });
+        setUserList([]);
+    } finally {
+        setLoading(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
-    let isMounted = true;
-
-    const fetchUsersWithGuard = async () => {
-        setLoading(true);
-        const users = await getUsers();
-        if (isMounted) {
-            setUserList(users);
-            setLoading(false);
-        }
-    };
-    
-    fetchUsersWithGuard();
-
-    return () => {
-        isMounted = false;
-    };
-  }, []);
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleAdd = () => {
     setSelectedUser(null);
@@ -166,6 +165,16 @@ export default function UsersPage() {
                  <TableRow>
                     <TableCell colSpan={5} className="h-24 text-center">
                         <Loader2 className="mx-auto h-6 w-6 animate-spin" />
+                    </TableCell>
+                </TableRow>
+              ) : error ? (
+                <TableRow>
+                    <TableCell colSpan={5} className="h-24 text-center">
+                        <div className="flex flex-col items-center gap-2 text-destructive">
+                            <AlertCircle className="h-8 w-8" />
+                            <span className="font-semibold">Terjadi Kesalahan</span>
+                            <p className="text-sm">{error}</p>
+                        </div>
                     </TableCell>
                 </TableRow>
               ) : userList.length > 0 ? (

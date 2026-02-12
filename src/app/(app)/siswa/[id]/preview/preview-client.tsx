@@ -5,7 +5,7 @@ import { Siswa } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowLeft, Printer, User, Calendar, MapPin, Droplet, Stethoscope, BookOpen, Building, Phone, Home, Users, Languages, HeartHandshake, Map, School, GraduationCap, History, CheckCircle2, XCircle, FileText, Briefcase } from 'lucide-react';
+import { ArrowLeft, Printer, User, Calendar, MapPin, Droplet, Stethoscope, BookOpen, Building, Phone, Home, Users, Languages, HeartHandshake, Map, School, GraduationCap, History, CheckCircle2, XCircle, FileText, Briefcase, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { getDesaName, getKecamatanName, getKabupatenName, getProvinceName } from '@/lib/wilayah';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 function InfoRow({ label, value, icon, className }: { label: string, value?: React.ReactNode, icon?: React.ElementType, className?: string }) {
     const Icon = icon;
@@ -31,30 +32,51 @@ export function PreviewSiswaClient({ id }: { id: string }) {
   const [loading, setLoading] = useState(true);
   const [alamatKk, setAlamatKk] = useState({provinsi: '', kabupaten: '', kecamatan: '', desa: ''});
   const [domisili, setDomisili] = useState({provinsi: '', kabupaten: '', kecamatan: '', desa: ''});
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     let isMounted = true;
     const fetchStudent = async () => {
         setLoading(true);
-        const result = await getSiswaById(id);
-        if (isMounted) {
-            if (result) {
-                setStudent(result);
-                // Fetch wilayah names
-                const [kkProv, kkKab, kkKec, kkDes, domProv, domKab, domKec, domDes] = await Promise.all([
-                    getProvinceName(result.siswa_alamatKkProvinsi),
-                    getKabupatenName(result.siswa_alamatKkKabupaten),
-                    getKecamatanName(result.siswa_alamatKkKecamatan),
-                    getDesaName(result.siswa_alamatKkDesa),
-                    getProvinceName(result.siswa_domisiliProvinsi),
-                    getKabupatenName(result.siswa_domisiliKabupaten),
-                    getKecamatanName(result.siswa_domisiliKecamatan),
-                    getDesaName(result.siswa_domisiliDesa),
-                ]);
-                setAlamatKk({provinsi: kkProv, kabupaten: kkKab, kecamatan: kkKec, desa: kkDes});
-                setDomisili({provinsi: domProv, kabupaten: domKab, kecamatan: domKec, desa: domDes});
+        setError(null);
+        try {
+            const result = await getSiswaById(id);
+            if (isMounted) {
+                if (result) {
+                    setStudent(result);
+                    // Fetch wilayah names
+                    const [kkProv, kkKab, kkKec, kkDes, domProv, domKab, domKec, domDes] = await Promise.all([
+                        getProvinceName(result.siswa_alamatKkProvinsi),
+                        getKabupatenName(result.siswa_alamatKkKabupaten),
+                        getKecamatanName(result.siswa_alamatKkKecamatan),
+                        getDesaName(result.siswa_alamatKkDesa),
+                        getProvinceName(result.siswa_domisiliProvinsi),
+                        getKabupatenName(result.siswa_domisiliKabupaten),
+                        getKecamatanName(result.siswa_domisiliKecamatan),
+                        getDesaName(result.siswa_domisiliDesa),
+                    ]);
+                    setAlamatKk({provinsi: kkProv, kabupaten: kkKab, kecamatan: kkKec, desa: kkDes});
+                    setDomisili({provinsi: domProv, kabupaten: domKab, kecamatan: domKec, desa: domDes});
+                } else {
+                    setError("Data siswa tidak ditemukan.");
+                }
             }
-            setLoading(false);
+        } catch(err: any) {
+             if (isMounted) {
+                console.error("Fetch student error:", err);
+                const errorMessage = "Gagal memuat data. Tidak dapat terhubung ke server database.";
+                setError(errorMessage);
+                toast({
+                    title: "Koneksi Gagal",
+                    description: err.message || "Terjadi kesalahan pada server.",
+                    variant: "destructive"
+                });
+            }
+        } finally {
+             if (isMounted) {
+                setLoading(false);
+            }
         }
     };
     fetchStudent();
@@ -62,8 +84,25 @@ export function PreviewSiswaClient({ id }: { id: string }) {
     return () => {
         isMounted = false;
     };
-  }, [id]);
-
+  }, [id, toast]);
+  
+  if (error) {
+    return (
+        <div className="bg-gray-100 dark:bg-gray-900 p-4 md:p-8 print:bg-white">
+            <div className="max-w-4xl mx-auto bg-white dark:bg-card rounded-xl shadow-2xl p-8 flex flex-col items-center justify-center text-center">
+                <AlertCircle className="w-16 h-16 text-destructive mb-4" />
+                <h2 className="text-2xl font-bold text-destructive">Gagal Memuat Preview</h2>
+                <p className="text-muted-foreground mt-2 mb-6">{error}</p>
+                <Button asChild variant="outline" className="print:hidden">
+                    <Link href="/siswa">
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Kembali ke Daftar
+                    </Link>
+                </Button>
+            </div>
+        </div>
+    )
+  }
 
   if (loading) {
       return (
@@ -85,7 +124,13 @@ export function PreviewSiswaClient({ id }: { id: string }) {
 
   const formatDate = (dateString?: string | Date) => {
       if (!dateString) return '-';
-      return new Date(dateString).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+      // Handle both Date object and string
+      const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+      // Check if date is valid
+      if (isNaN(date.getTime())) return '-';
+      // Add timezone offset to counteract UTC conversion issues before formatting
+      const adjustedDate = new Date(date.valueOf() + date.getTimezoneOffset() * 60 * 1000);
+      return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(adjustedDate);
   }
   
   const studentStatus = student.status === 'Lengkap';

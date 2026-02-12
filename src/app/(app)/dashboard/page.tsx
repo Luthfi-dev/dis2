@@ -4,8 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Users, Briefcase, ArrowRight, History, BookCopy } from 'lucide-react';
+import { Users, Briefcase, ArrowRight, History, BookCopy, AlertCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '@/hooks/use-auth';
 import { getSiswa, getPegawai } from '@/lib/actions';
@@ -13,18 +12,23 @@ import { getActivities, Activity } from '@/lib/activity-log';
 import { formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useAppSettings } from '@/hooks/use-app-settings';
+import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const { settings } = useAppSettings();
+  const { toast } = useToast();
   const [siswaCount, setSiswaCount] = useState(0);
   const [pegawaiCount, setPegawaiCount] = useState(0);
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
     async function fetchData() {
         try {
+            setError(null);
             const [siswaResult, pegawaiResult] = await Promise.all([
                 getSiswa('', 1, 1),
                 getPegawai('', 1, 1)
@@ -36,8 +40,16 @@ export default function DashboardPage() {
                 setPegawaiCount(pegawaiResult.total);
                 setActivities(activitiesData);
             }
-        } catch (error) {
-            console.error("Failed to load dashboard data from server", error);
+        } catch (err: any) {
+            console.error("Failed to load dashboard data from server", err);
+            if (isMounted) {
+                setError("Gagal memuat data ringkasan.");
+                 toast({
+                    title: "Koneksi Gagal",
+                    description: err.message,
+                    variant: "destructive"
+                });
+            }
         }
     }
     fetchData();
@@ -45,7 +57,7 @@ export default function DashboardPage() {
     return () => {
         isMounted = false;
     };
-  }, []);
+  }, [toast]);
 
   const chartData = [
     { name: 'Siswa', total: siswaCount },
@@ -54,6 +66,15 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
+      {error && (
+            <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Gagal Memuat Data Dasbor</AlertTitle>
+                <AlertDescription>
+                    {error} Mohon periksa koneksi Anda dan coba lagi.
+                </AlertDescription>
+            </Alert>
+        )}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Selamat Datang, {user?.name}!</h1>
         <p className="text-muted-foreground">Berikut adalah ringkasan dari aplikasi {settings?.app_title || "EduArchive"} Anda.</p>
