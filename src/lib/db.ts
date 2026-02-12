@@ -24,3 +24,4 @@ const pool = mysql.createPool(dbConfig);
 
 // Export the pool directly. It's designed to handle connection management.
 export default pool;
+
