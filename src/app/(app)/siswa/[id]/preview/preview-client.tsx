@@ -69,7 +69,7 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                 setError(errorMessage);
                 toast({
                     title: "Koneksi Gagal",
-                    description: err.message || "Terjadi kesalahan pada server.",
+                    description: err.message,
                     variant: "destructive"
                 });
             }
@@ -124,13 +124,16 @@ export function PreviewSiswaClient({ id }: { id: string }) {
 
   const formatDate = (dateString?: string | Date) => {
       if (!dateString) return '-';
-      // Handle both Date object and string
-      const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
-      // Check if date is valid
-      if (isNaN(date.getTime())) return '-';
-      // Add timezone offset to counteract UTC conversion issues before formatting
-      const adjustedDate = new Date(date.valueOf() + date.getTimezoneOffset() * 60 * 1000);
-      return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(adjustedDate);
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+          return '-';
+      }
+      return new Intl.DateTimeFormat('id-ID', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'UTC'
+      }).format(date);
   }
   
   const studentStatus = student.status === 'Lengkap';
@@ -303,3 +306,5 @@ export function PreviewSiswaClient({ id }: { id: string }) {
     </div>
   );
 }
+
+    
