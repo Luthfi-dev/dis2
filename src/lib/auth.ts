@@ -15,8 +15,9 @@ export type User = {
 };
 
 export async function loginAction(email: string, pass: string): Promise<{ success: boolean; user?: User; error?: string }> {
-    const db = await pool.getConnection();
+    let db;
     try {
+        db = await pool.getConnection();
         const [rows]: any[] = await db.query('SELECT * FROM users WHERE email = ?', [email.toLowerCase()]);
         const user = rows[0];
 
@@ -41,13 +42,14 @@ export async function loginAction(email: string, pass: string): Promise<{ succes
         console.error('Login Error:', error);
         return { success: false, error: `Terjadi kesalahan pada server: ${error.message}` };
     } finally {
-        db.release();
+        if(db) db.release();
     }
 }
 
 export async function updateUserAction(updatedUserData: Partial<User> & { id: string }): Promise<{ success: boolean, user?: User, error?: string }> {
-    const db = await pool.getConnection();
+    let db;
     try {
+        db = await pool.getConnection();
         await db.beginTransaction();
         const { id, ...dataToUpdate } = updatedUserData;
 
@@ -76,27 +78,32 @@ export async function updateUserAction(updatedUserData: Partial<User> & { id: st
         return { success: true, user: updatedUser };
 
     } catch (error: any) {
-        await db.rollback();
+        if(db) await db.rollback();
         console.error('Update User Error:', error);
         return { success: false, error: `Gagal memperbarui pengguna: ${error.message}` };
     } finally {
-        db.release();
+        if(db) db.release();
     }
 }
 
 export async function getUsers(): Promise<User[]> {
-    const db = await pool.getConnection();
+    let db;
     try {
+        db = await pool.getConnection();
         const [rows] = await db.query("SELECT id, email, name, role, status, avatar FROM users WHERE role != 'superadmin'");
         return rows as User[];
+    } catch(error: any) {
+        console.error("Database Error in getUsers:", error);
+        throw new Error(`Gagal mengambil data pengguna: ${error.message}`);
     } finally {
-        db.release();
+        if(db) db.release();
     }
 }
 
 export async function saveUser(user: Partial<User> & { id?: string }): Promise<{ success: boolean; message: string }> {
-    const db = await pool.getConnection();
+    let db;
     try {
+        db = await pool.getConnection();
         await db.beginTransaction();
         const isUpdating = !!user.id;
         
@@ -134,20 +141,21 @@ export async function saveUser(user: Partial<User> & { id?: string }): Promise<{
             return { success: true, message: 'Pengguna berhasil ditambahkan.' };
         }
     } catch (error: any) {
-        await db.rollback();
+        if(db) await db.rollback();
         console.error("Error saving user:", error);
         if (error.code === 'ER_DUP_ENTRY') {
             return { success: false, message: 'Email sudah terdaftar.' };
         }
         return { success: false, message: `Gagal menyimpan pengguna: ${error.message}` };
     } finally {
-        db.release();
+        if(db) db.release();
     }
 }
 
 export async function deleteUser(id: string): Promise<{ success: boolean; message: string }> {
-    const db = await pool.getConnection();
+    let db;
     try {
+        db = await pool.getConnection();
         await db.beginTransaction();
         const [result]: any = await db.query('DELETE FROM users WHERE id = ?', [id]);
         await db.commit();
@@ -156,11 +164,11 @@ export async function deleteUser(id: string): Promise<{ success: boolean; messag
         }
         return { success: false, message: 'Pengguna tidak ditemukan.' };
     } catch (error: any) {
-        await db.rollback();
+        if(db) await db.rollback();
         console.error("Error deleting user:", error);
         return { success: false, message: `Gagal menghapus pengguna: ${error.message}` };
     } finally {
-        db.release();
+        if(db) db.release();
     }
 }
 
@@ -177,3 +185,5 @@ export async function generateHash(password: string): Promise<{ success: boolean
         return { success: false, error: `Gagal membuat hash: ${error.message}` };
     }
 }
+
+    

@@ -33,8 +33,9 @@ function parseJsonFields(row: any) {
 
 // SISWA ACTIONS
 export async function getSiswa(searchTerm: string, page: number, limit: number): Promise<{ data: Siswa[], total: number }> {
-    const db = await pool.getConnection();
+    let db;
     try {
+        db = await pool.getConnection();
         const offset = (page - 1) * limit;
         let whereClause = '';
         const params: (string | number)[] = [];
@@ -52,24 +53,32 @@ export async function getSiswa(searchTerm: string, page: number, limit: number):
         const [rows] = await db.query(dataQuery, [...params, limit, offset]);
         
         return { data: (rows as Siswa[]).map(parseJsonFields), total };
+    } catch (error: any) {
+        console.error('Database Error in getSiswa:', error);
+        throw new Error(`Gagal mengambil data siswa: ${error.message}`);
     } finally {
-        db.release();
+        if (db) db.release();
     }
 }
 
 export async function getSiswaById(id: string): Promise<Siswa | null> {
-    const db = await pool.getConnection();
+    let db;
     try {
+        db = await pool.getConnection();
         const [rows] = await db.query('SELECT * FROM siswa WHERE id = ?', [id]);
         return parseJsonFields((rows as Siswa[])[0] || null);
+    } catch (error: any) {
+        console.error('Database Error in getSiswaById:', error);
+        throw new Error(`Gagal mengambil data siswa: ${error.message}`);
     } finally {
-        db.release();
+        if (db) db.release();
     }
 }
 
 export async function deleteSiswa(id: string): Promise<{ success: boolean; message: string }> {
-    const db = await pool.getConnection();
+    let db;
     try {
+      db = await pool.getConnection();
       const [result]:any = await db.query('DELETE FROM siswa WHERE id = ?', [id]);
       if (result.affectedRows > 0) {
           const message = `Data siswa berhasil dihapus.`;
@@ -77,15 +86,17 @@ export async function deleteSiswa(id: string): Promise<{ success: boolean; messa
       }
       return { success: false, message: 'Gagal menghapus data siswa.' };
     } catch (error: any) {
-        return { success: false, message: `Gagal menghapus data siswa: ${error.message}` };
+        console.error("Database Error in deleteSiswa:", error);
+        throw new Error(`Gagal menghapus data siswa: ${error.message}`);
     } finally {
-        db.release();
+        if (db) db.release();
     }
 }
 
 export async function submitStudentData(data: StudentFormData, studentId?: string) {
-    const db = await pool.getConnection();
+    let db;
     try {
+        db = await pool.getConnection();
         // Cek duplikat hanya jika NIS atau NISN diisi
         if (data.siswa_nis || data.siswa_nisn) {
             const conditions = [];
@@ -164,19 +175,20 @@ export async function submitStudentData(data: StudentFormData, studentId?: strin
         return { success: true, message };
 
     } catch (error: any) {
-        await db.rollback();
+        if(db) await db.rollback();
         console.error("Student submission server error:", error);
-        return { success: false, message: `Gagal menyimpan data siswa karena kesalahan server: ${error.message}` };
+        throw new Error(`Gagal menyimpan data siswa: ${error.message}`);
     } finally {
-        db.release();
+        if (db) db.release();
     }
 }
 
 
 // PEGAWAI ACTIONS
 export async function getPegawai(searchTerm: string, page: number, limit: number): Promise<{ data: Pegawai[], total: number }> {
-    const db = await pool.getConnection();
+    let db;
     try {
+        db = await pool.getConnection();
         const offset = (page - 1) * limit;
         let whereClause = '';
         const params: (string | number)[] = [];
@@ -194,24 +206,32 @@ export async function getPegawai(searchTerm: string, page: number, limit: number
         const [rows] = await db.query(dataQuery, [...params, limit, offset]);
 
         return { data: (rows as Pegawai[]).map(parseJsonFields), total };
+    } catch (error: any) {
+        console.error('Database Error in getPegawai:', error);
+        throw new Error(`Gagal mengambil data pegawai: ${error.message}`);
     } finally {
-        db.release();
+        if (db) db.release();
     }
 }
 
 export async function getPegawaiById(id: string): Promise<Pegawai | null> {
-    const db = await pool.getConnection();
+    let db;
     try {
+        db = await pool.getConnection();
         const [rows] = await db.query('SELECT * FROM pegawai WHERE id = ?', [id]);
         return parseJsonFields((rows as Pegawai[])[0] || null);
+    } catch (error: any) {
+        console.error('Database Error in getPegawaiById:', error);
+        throw new Error(`Gagal mengambil data pegawai: ${error.message}`);
     } finally {
-        db.release();
+        if (db) db.release();
     }
 }
 
 export async function deletePegawai(id: string): Promise<{ success: boolean; message: string }> {
-     const db = await pool.getConnection();
+     let db;
      try {
+        db = await pool.getConnection();
         const [result]:any = await db.query('DELETE FROM pegawai WHERE id = ?', [id]);
         if (result.affectedRows > 0) {
             const message = `Data pegawai berhasil dihapus.`;
@@ -219,15 +239,17 @@ export async function deletePegawai(id: string): Promise<{ success: boolean; mes
         }
         return { success: false, message: 'Gagal menghapus data pegawai.' };
     } catch (error: any) {
-        return { success: false, message: `Gagal menghapus data pegawai: ${error.message}` };
+        console.error("Database Error in deletePegawai:", error);
+        throw new Error(`Gagal menghapus data pegawai: ${error.message}`);
     } finally {
-        db.release();
+        if (db) db.release();
     }
 }
 
 export async function submitPegawaiData(data: PegawaiFormData, pegawaiId?: string) {
-    const db = await pool.getConnection();
+    let db;
     try {
+        db = await pool.getConnection();
         if (data.pegawai_nip) {
             const checkQuery = 'SELECT id FROM pegawai WHERE pegawai_nip = ?';
             const params = [data.pegawai_nip];
@@ -294,11 +316,11 @@ export async function submitPegawaiData(data: PegawaiFormData, pegawaiId?: strin
         return { success: true, message };
 
     } catch (error: any) {
-        await db.rollback();
+        if(db) await db.rollback();
         console.error("Pegawai submission server error:", error);
-        return { success: false, message: `Gagal menyimpan data pegawai karena kesalahan server: ${error.message}` };
+        throw new Error(`Gagal menyimpan data pegawai: ${error.message}`);
     } finally {
-        db.release();
+        if (db) db.release();
     }
 }
 
@@ -312,19 +334,24 @@ export type AppSettings = {
 };
 
 export async function getAppSettings(): Promise<AppSettings> {
-    const db = await pool.getConnection();
+    let db;
     try {
+        db = await pool.getConnection();
         const [rows] = await db.query('SELECT app_title, app_description, app_logo_url FROM app_settings WHERE id = 1');
         const settings = (rows as AppSettings[])[0];
         return settings || { app_title: 'EduArchive', app_description: 'Aplikasi Buku Induk Siswa Digital' };
+    } catch (error: any) {
+        console.error('Database Error in getAppSettings:', error);
+        throw new Error(`Gagal mengambil pengaturan aplikasi: ${error.message}`);
     } finally {
-        db.release();
+        if (db) db.release();
     }
 }
 
 export async function saveAppSettings(data: AppSettings): Promise<{ success: boolean; message: string }> {
-    const db = await pool.getConnection();
+    let db;
     try {
+        db = await pool.getConnection();
         const { app_title, app_description, app_logo_url } = data;
         await db.query(
             'UPDATE app_settings SET app_title = ?, app_description = ?, app_logo_url = ? WHERE id = 1',
@@ -333,9 +360,9 @@ export async function saveAppSettings(data: AppSettings): Promise<{ success: boo
         return { success: true, message: 'Pengaturan aplikasi berhasil disimpan.' };
     } catch (error: any) {
         console.error("Error saving app settings:", error);
-        return { success: false, message: `Gagal menyimpan pengaturan: ${error.message}` };
+        throw new Error(`Gagal menyimpan pengaturan aplikasi: ${error.message}`);
     } finally {
-        db.release();
+        if (db) db.release();
     }
 }
 
@@ -350,103 +377,109 @@ export type ImportResult = {
 };
 
 export async function importData(type: 'siswa' | 'pegawai', fileBase64: string): Promise<ImportResult> {
-    const db = await pool.getConnection();
-    const workbook = new Excel.Workbook();
-    const fileBuffer = Buffer.from(fileBase64, 'base64');
-    await workbook.xlsx.load(fileBuffer);
-    const worksheet = workbook.worksheets[0];
+    let db;
+    try {
+        db = await pool.getConnection();
+        const workbook = new Excel.Workbook();
+        const fileBuffer = Buffer.from(fileBase64, 'base64');
+        await workbook.xlsx.load(fileBuffer);
+        const worksheet = workbook.worksheets[0];
 
-    const results: ImportResult = {
-        success: true,
-        message: 'Impor selesai.',
-        totalRows: worksheet.rowCount - 1,
-        successCount: 0,
-        failureCount: 0,
-        errors: [],
-    };
+        const results: ImportResult = {
+            success: true,
+            message: 'Impor selesai.',
+            totalRows: worksheet.rowCount - 1,
+            successCount: 0,
+            failureCount: 0,
+            errors: [],
+        };
 
-    const headerRow = worksheet.getRow(1);
-    
-    // Map header names to column keys
-    const headerToKeyMap: { [key: string]: string } = {};
-    const headerConfigs = type === 'siswa' ? siswaHeaders : pegawaiHeaders;
-    
-    headerRow.eachCell((cell, colNumber) => {
-        const headerText = cell.text;
-        const foundHeader = headerConfigs.find(h => h.header === headerText);
-        if (foundHeader) {
-            headerToKeyMap[colNumber] = foundHeader.key;
-        }
-    });
-
-    for (let i = 2; i <= worksheet.rowCount; i++) {
-        const row = worksheet.getRow(i);
-        const rowData: any = {};
-        let hasData = false;
+        const headerRow = worksheet.getRow(1);
         
-        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-            const key = headerToKeyMap[colNumber];
-            if (key) {
-                let cellValue = null;
-                if (cell.value && typeof cell.value === 'object' && 'result' in cell.value!) {
-                     cellValue = (cell.value as any).result;
-                } else {
-                     cellValue = cell.value;
-                }
-                
-                if (cellValue !== null && cellValue !== undefined) {
-                    rowData[key] = cellValue;
-                    hasData = true;
-                }
+        const headerToKeyMap: { [key: string]: string } = {};
+        const headerConfigs = type === 'siswa' ? siswaHeaders : pegawaiHeaders;
+        
+        headerRow.eachCell((cell, colNumber) => {
+            const headerText = cell.text;
+            const foundHeader = headerConfigs.find(h => h.header === headerText);
+            if (foundHeader) {
+                headerToKeyMap[colNumber] = foundHeader.key;
             }
         });
 
-        if (!hasData) continue; // Skip empty rows
-
-        try {
-            if (type === 'siswa') {
-                 if (!rowData.siswa_namaLengkap) throw new Error('Nama Lengkap wajib diisi.');
-                 if (!rowData.siswa_nis) throw new Error('NIS wajib diisi.');
-                 if (!rowData.siswa_nisn) throw new Error('NISN wajib diisi.');
-
-                const [existing]: any = await db.query(
-                    'SELECT id FROM siswa WHERE siswa_nis = ? OR siswa_nisn = ?',
-                    [rowData.siswa_nis, rowData.siswa_nisn]
-                );
-                if (existing.length > 0) {
-                    throw new Error(`NIS (${rowData.siswa_nis}) atau NISN (${rowData.siswa_nisn}) sudah ada.`);
+        for (let i = 2; i <= worksheet.rowCount; i++) {
+            const row = worksheet.getRow(i);
+            const rowData: any = {};
+            let hasData = false;
+            
+            row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                const key = headerToKeyMap[colNumber];
+                if (key) {
+                    let cellValue = null;
+                    if (cell.value && typeof cell.value === 'object' && 'result' in cell.value!) {
+                         cellValue = (cell.value as any).result;
+                    } else {
+                         cellValue = cell.value;
+                    }
+                    
+                    if (cellValue !== null && cellValue !== undefined) {
+                        rowData[key] = cellValue;
+                        hasData = true;
+                    }
                 }
-                await submitStudentData(rowData);
-            } else if (type === 'pegawai') {
-                 if (!rowData.pegawai_nama) throw new Error('Nama Lengkap wajib diisi.');
-                 if (!rowData.pegawai_nip) throw new Error('NIP wajib diisi.');
-                
-                const [existing]: any = await db.query(
-                    'SELECT id FROM pegawai WHERE pegawai_nip = ?',
-                    [rowData.pegawai_nip]
-                );
-                if (existing.length > 0) {
-                    throw new Error(`NIP ${rowData.pegawai_nip} sudah ada.`);
+            });
+
+            if (!hasData) continue; // Skip empty rows
+
+            try {
+                if (type === 'siswa') {
+                     if (!rowData.siswa_namaLengkap) throw new Error('Nama Lengkap wajib diisi.');
+                     if (!rowData.siswa_nis) throw new Error('NIS wajib diisi.');
+                     if (!rowData.siswa_nisn) throw new Error('NISN wajib diisi.');
+
+                    const [existing]: any = await db.query(
+                        'SELECT id FROM siswa WHERE siswa_nis = ? OR siswa_nisn = ?',
+                        [rowData.siswa_nis, rowData.siswa_nisn]
+                    );
+                    if (existing.length > 0) {
+                        throw new Error(`NIS (${rowData.siswa_nis}) atau NISN (${rowData.siswa_nisn}) sudah ada.`);
+                    }
+                    await submitStudentData(rowData);
+                } else if (type === 'pegawai') {
+                     if (!rowData.pegawai_nama) throw new Error('Nama Lengkap wajib diisi.');
+                     if (!rowData.pegawai_nip) throw new Error('NIP wajib diisi.');
+                    
+                    const [existing]: any = await db.query(
+                        'SELECT id FROM pegawai WHERE pegawai_nip = ?',
+                        [rowData.pegawai_nip]
+                    );
+                    if (existing.length > 0) {
+                        throw new Error(`NIP ${rowData.pegawai_nip} sudah ada.`);
+                    }
+                    await submitPegawaiData(rowData);
                 }
-                await submitPegawaiData(rowData);
+                results.successCount++;
+            } catch (e: any) {
+                results.failureCount++;
+                results.errors.push({ row: i, reason: e.message || 'Error tidak diketahui' });
             }
-            results.successCount++;
-        } catch (e: any) {
-            results.failureCount++;
-            results.errors.push({ row: i, reason: e.message || 'Error tidak diketahui' });
         }
-    }
-    
-    db.release();
+        
+        if(results.failureCount > 0) {
+            results.success = false;
+            results.message = `Impor selesai dengan ${results.failureCount} error.`
+        } else {
+            results.message = `Berhasil mengimpor ${results.successCount} data.`
+        }
 
-    if(results.failureCount > 0) {
-        results.success = false;
-        results.message = `Impor selesai dengan ${results.failureCount} error.`
-    } else {
-        results.message = `Berhasil mengimpor ${results.successCount} data.`
-    }
+        return results;
 
-    return results;
+    } catch (error: any) {
+        console.error('Database Error in importData:', error);
+        throw new Error(`Gagal mengimpor data: ${error.message}`);
+    } finally {
+        if(db) db.release();
+    }
 }
 
 const siswaHeaders = [
@@ -477,3 +510,5 @@ const pegawaiHeaders = [
     { header: 'NRG', key: 'pegawai_nrg' },
     { header: 'Bidang Studi', key: 'pegawai_bidangStudi' },
 ];
+
+    

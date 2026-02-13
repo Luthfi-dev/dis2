@@ -174,11 +174,16 @@ function ImportDialog({ onImportComplete }: { onImportComplete: (result: ImportR
       return;
     }
     startImportTransition(async () => {
-        const fileBase64 = await toBase64(file);
-        const result = await importData('siswa', fileBase64);
-        onImportComplete(result);
-        setFile(null);
-        setIsOpen(false);
+        try {
+            const fileBase64 = await toBase64(file);
+            const result = await importData('siswa', fileBase64);
+            onImportComplete(result);
+        } catch (err: any) {
+            toast({ title: "Error Impor", description: err.message, variant: "destructive"});
+        } finally {
+            setFile(null);
+            setIsOpen(false);
+        }
     });
   };
 
@@ -234,12 +239,12 @@ export default function SiswaPage() {
       getSiswa(search, page, ITEMS_PER_PAGE).then(result => {
         setStudents(result.data);
         setTotalStudents(result.total);
-      }).catch((err) => {
+      }).catch((err: any) => {
         console.error("Failed to fetch students:", err);
-        setError(`Gagal memuat data siswa. Kesalahan: ${err.message}`);
+        setError(err.message || 'Gagal memuat data siswa.');
         toast({
-          title: "Koneksi Database Gagal",
-          description: err.message || "Tidak dapat terhubung ke server.",
+          title: "Koneksi Gagal",
+          description: err.message,
           variant: "destructive"
         });
       }).finally(() => {
@@ -270,13 +275,17 @@ export default function SiswaPage() {
 
   const handleDeleteStudent = (id: string) => {
     startDeleteTransition(async () => {
-      const result = await deleteSiswa(id);
-      if (result.success) {
-        toast({ title: 'Sukses!', description: result.message });
-        // Refresh data after deletion
-        debouncedFetchStudents(searchTerm, currentPage);
-      } else {
-        toast({ title: 'Gagal', description: result.message, variant: 'destructive' });
+      try {
+        const result = await deleteSiswa(id);
+        if (result.success) {
+          toast({ title: 'Sukses!', description: result.message });
+          // Refresh data after deletion
+          debouncedFetchStudents(searchTerm, currentPage);
+        } else {
+          toast({ title: 'Gagal', description: result.message, variant: 'destructive' });
+        }
+      } catch (err: any) {
+         toast({ title: 'Gagal Menghapus', description: err.message, variant: 'destructive' });
       }
     });
   };
@@ -468,3 +477,5 @@ export default function SiswaPage() {
     </div>
   );
 }
+
+    
