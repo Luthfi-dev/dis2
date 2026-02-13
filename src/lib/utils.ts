@@ -35,23 +35,7 @@ export function mergeDeep(target: any, source: any): any {
 }
 
 /**
- * Sanitizes a string by replacing HTML special characters with their entities.
- * @param str The string to sanitize.
- * @returns The sanitized string.
- */
-function escapeHtml(str: string): string {
-  if (typeof str !== 'string') return str;
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-/**
  * Recursively sanitizes and formats data for database insertion.
- * - Escapes HTML in strings.
  * - Converts empty strings to null.
  * - Stringifies objects/arrays.
  * @param data The object or value to process.
@@ -77,7 +61,7 @@ export function sanitizeAndFormatData(data: any): any {
       } else if (Array.isArray(value)) {
         sanitizedData[key] = JSON.stringify(value);
       } else if (typeof value === 'string') {
-        sanitizedData[key] = value === '' ? null : escapeHtml(value);
+        sanitizedData[key] = value.trim() === '' ? null : value;
       } else if (value === undefined) {
         sanitizedData[key] = null;
       } else {

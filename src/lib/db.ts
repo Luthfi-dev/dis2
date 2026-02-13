@@ -5,13 +5,13 @@ import { config } from 'dotenv';
 // Load environment variables from .env file
 config();
 
-// This configuration is now a factory function to ensure fresh config for each pool instance.
+// This configuration now relies solely on environment variables.
 const dbConfig = {
-    host: process.env.DB_HOST || '195.88.211.130',
-    user: process.env.DB_USER || 'maudigic_gg',
-    password: process.env.DB_PASSWORD || 'B4ru123456_',
-    database: process.env.DB_DATABASE || 'maudigic_buku_induk_siswa',
-    port: parseInt(process.env.DB_PORT || '3306', 10),
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 3306,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
@@ -24,4 +24,3 @@ const pool = mysql.createPool(dbConfig);
 
 // Export the pool directly. It's designed to handle connection management.
 export default pool;
-
