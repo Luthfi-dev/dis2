@@ -84,7 +84,7 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
         } catch(err: any) {
              if (isMounted) {
                 console.error("Fetch pegawai error:", err);
-                const errorMessage = "Gagal memuat data. Tidak dapat terhubung ke server database.";
+                const errorMessage = `Gagal memuat data: ${err.message || 'Tidak dapat terhubung ke server database.'}`;
                 setError(errorMessage);
                 toast({
                     title: "Koneksi Gagal",

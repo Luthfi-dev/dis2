@@ -239,7 +239,7 @@ export default function SiswaPage() {
         setError(`Gagal memuat data siswa. Kesalahan: ${err.message}`);
         toast({
           title: "Koneksi Database Gagal",
-          description: "Tidak dapat terhubung ke server. Silakan coba lagi nanti.",
+          description: err.message || "Tidak dapat terhubung ke server.",
           variant: "destructive"
         });
       }).finally(() => {

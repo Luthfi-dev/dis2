@@ -57,7 +57,7 @@ export default function UsersPage() {
         setError(`Gagal memuat data pengguna. Kesalahan: ${err.message}`);
         toast({
           title: "Koneksi Database Gagal",
-          description: "Tidak dapat terhubung ke server. Silakan coba lagi nanti.",
+          description: err.message || "Tidak dapat terhubung ke server.",
           variant: "destructive"
         });
         setUserList([]);

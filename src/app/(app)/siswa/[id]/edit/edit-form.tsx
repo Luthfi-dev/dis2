@@ -34,7 +34,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
       } catch (err: any) {
         if (isMounted) {
           console.error("Fetch student error:", err);
-          const errorMessage = "Gagal memuat data. Tidak dapat terhubung ke server database.";
+          const errorMessage = `Gagal memuat data. Kesalahan: ${err.message || 'Tidak dapat terhubung ke server database.'}`;
           setError(errorMessage);
           toast({
               title: "Koneksi Gagal",

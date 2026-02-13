@@ -43,7 +43,7 @@ export default function DashboardPage() {
         } catch (err: any) {
             console.error("Failed to load dashboard data from server", err);
             if (isMounted) {
-                setError("Gagal memuat data ringkasan.");
+                setError(`Gagal memuat data ringkasan. Kesalahan: ${err.message}`);
                  toast({
                     title: "Koneksi Gagal",
                     description: err.message,
