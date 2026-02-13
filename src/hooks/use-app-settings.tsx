@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
 import type { AppSettings } from '@/lib/actions';
 import { getAppSettings, saveAppSettings } from '@/lib/actions';
+import { useToast } from './use-toast';
 
 interface AppSettingsContextType {
   settings: AppSettings | null;
@@ -17,6 +18,7 @@ const SETTINGS_STORAGE_KEY = 'eduarchive_app_settings';
 export function AppSettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettingsState] = useState<AppSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     let isMounted = true;
@@ -35,8 +37,15 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
             setSettingsState(freshSettings);
             localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(freshSettings));
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to load app settings", error);
+        if (isMounted) {
+          toast({
+            title: "Koneksi Awal Gagal",
+            description: `Tidak dapat memuat pengaturan aplikasi. Kesalahan: ${error.message}`,
+            variant: "destructive"
+          });
+        }
       } finally {
         if (isMounted) {
             setLoading(false);
@@ -48,7 +57,7 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
     return () => {
         isMounted = false;
     };
-  }, []);
+  }, [toast]);
 
   const handleSetSettings = async (newSettings: AppSettings) => {
     setLoading(true);

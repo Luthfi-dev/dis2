@@ -317,9 +317,6 @@ export async function getAppSettings(): Promise<AppSettings> {
         const [rows] = await db.query('SELECT app_title, app_description, app_logo_url FROM app_settings WHERE id = 1');
         const settings = (rows as AppSettings[])[0];
         return settings || { app_title: 'EduArchive', app_description: 'Aplikasi Buku Induk Siswa Digital' };
-    } catch(e) {
-        console.error("Could not get app settings, returning default.", e);
-        return { app_title: 'EduArchive', app_description: 'Aplikasi Buku Induk Siswa Digital' };
     } finally {
         db.release();
     }
@@ -480,4 +477,3 @@ const pegawaiHeaders = [
     { header: 'NRG', key: 'pegawai_nrg' },
     { header: 'Bidang Studi', key: 'pegawai_bidangStudi' },
 ];
-

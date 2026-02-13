@@ -39,7 +39,7 @@ export async function loginAction(email: string, pass: string): Promise<{ succes
 
     } catch (error: any) {
         console.error('Login Error:', error);
-        return { success: false, error: 'Terjadi kesalahan pada server.' };
+        return { success: false, error: `Terjadi kesalahan pada server: ${error.message}` };
     } finally {
         db.release();
     }
@@ -78,7 +78,7 @@ export async function updateUserAction(updatedUserData: Partial<User> & { id: st
     } catch (error: any) {
         await db.rollback();
         console.error('Update User Error:', error);
-        return { success: false, error: 'Gagal memperbarui pengguna.' };
+        return { success: false, error: `Gagal memperbarui pengguna: ${error.message}` };
     } finally {
         db.release();
     }
