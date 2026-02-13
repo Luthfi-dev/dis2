@@ -241,7 +241,8 @@ export default function SiswaPage() {
         setTotalStudents(result.total);
       }).catch((err: any) => {
         console.error("Failed to fetch students:", err);
-        setError(err.message || 'Gagal memuat data siswa.');
+        const detailedError = `Gagal terhubung ke database. Pastikan variabel .env (DB_HOST, dll) sudah benar dan firewall mengizinkan koneksi. Detail: ${err.message}`;
+        setError(detailedError);
         toast({
           title: "Koneksi Gagal",
           description: err.message,

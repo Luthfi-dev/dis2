@@ -238,7 +238,8 @@ export default function PegawaiPage() {
         setTotalPegawai(result.total);
       }).catch((err) => {
         console.error("Failed to fetch pegawai:", err);
-        setError(`Gagal memuat data pegawai. Kesalahan: ${err.message}`);
+        const detailedError = `Gagal terhubung ke database. Pastikan variabel .env (DB_HOST, dll) sudah benar dan firewall mengizinkan koneksi. Detail: ${err.message}`;
+        setError(detailedError);
         toast({
           title: "Koneksi Database Gagal",
           description: err.message || "Tidak dapat terhubung ke server.",

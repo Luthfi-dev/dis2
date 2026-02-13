@@ -43,7 +43,8 @@ export default function DashboardPage() {
         } catch (err: any) {
             console.error("Failed to load dashboard data from server", err);
             if (isMounted) {
-                setError(`Gagal memuat data ringkasan. Kesalahan: ${err.message}`);
+                const detailedError = `Gagal terhubung ke database. Pastikan variabel .env (DB_HOST, dll) sudah benar dan firewall mengizinkan koneksi. Detail: ${err.message}`;
+                setError(detailedError);
                  toast({
                     title: "Koneksi Gagal",
                     description: err.message,
@@ -71,7 +72,7 @@ export default function DashboardPage() {
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Gagal Memuat Data Dasbor</AlertTitle>
                 <AlertDescription>
-                    {error} Mohon periksa koneksi Anda dan coba lagi.
+                    {error}
                 </AlertDescription>
             </Alert>
         )}

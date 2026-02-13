@@ -41,8 +41,8 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
         console.error("Failed to load app settings", error);
         if (isMounted) {
           toast({
-            title: "Koneksi Awal Gagal",
-            description: `Tidak dapat memuat pengaturan aplikasi. Kesalahan: ${error.message}`,
+            title: "Koneksi Database Gagal",
+            description: `Gagal terhubung ke database. Pastikan variabel .env (DB_HOST, dll) sudah benar dan firewall mengizinkan koneksi. Detail: ${error.message}`,
             variant: "destructive"
           });
         }

@@ -87,8 +87,8 @@ export function LihatSiswaClient({ id }: { id: string }) {
             } catch (err: any) {
                 if (isMounted) {
                     console.error("Fetch student error:", err);
-                    const errorMessage = `Gagal memuat data: ${err.message || 'Tidak dapat terhubung ke server database.'}`;
-                    setError(errorMessage);
+                    const detailedError = `Gagal terhubung ke database. Pastikan variabel .env (DB_HOST, dll) sudah benar dan firewall mengizinkan koneksi. Detail: ${err.message}`;
+                    setError(detailedError);
                     toast({
                         title: "Koneksi Gagal",
                         description: err.message,

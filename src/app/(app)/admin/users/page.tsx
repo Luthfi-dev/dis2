@@ -54,7 +54,8 @@ export default function UsersPage() {
         setUserList(users);
     } catch (err: any) {
         console.error("Failed to fetch users:", err);
-        setError(`Gagal memuat data pengguna. Kesalahan: ${err.message}`);
+        const detailedError = `Gagal terhubung ke database. Pastikan variabel .env (DB_HOST, dll) sudah benar dan firewall mengizinkan koneksi. Detail: ${err.message}`;
+        setError(detailedError);
         toast({
           title: "Koneksi Database Gagal",
           description: err.message || "Tidak dapat terhubung ke server.",
