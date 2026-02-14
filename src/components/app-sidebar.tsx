@@ -38,6 +38,7 @@ const bukuIndukPegawaiMenuItems = [
 
 const adminMenuItems = [
     { href: '/admin/users', label: 'Kelola Pengguna', icon: Users },
+    { href: '/admin/settings', label: 'Pengaturan Aplikasi', icon: Settings },
 ];
 
 export function AppSidebar() {
@@ -123,7 +124,6 @@ export function AppSidebar() {
                 <SidebarMenuItem key={index}>
                   <Link href={item.href} className="w-full" onClick={handleLinkClick}>
                     <SidebarMenuButton
-                      variant="ghost"
                       size="sm"
                       isActive={pathname === item.href}
                        className={cn(
@@ -164,7 +164,6 @@ export function AppSidebar() {
                 <SidebarMenuItem key={index}>
                   <Link href={item.href} className="w-full" onClick={handleLinkClick}>
                     <SidebarMenuButton
-                      variant="ghost"
                       size="sm"
                       isActive={pathname === item.href}
                        className={cn(
@@ -206,7 +205,6 @@ export function AppSidebar() {
                     <SidebarMenuItem key={index}>
                     <Link href={item.href} className="w-full" onClick={handleLinkClick}>
                         <SidebarMenuButton
-                        variant="ghost"
                         size="sm"
                         isActive={pathname === item.href}
                         className={cn(

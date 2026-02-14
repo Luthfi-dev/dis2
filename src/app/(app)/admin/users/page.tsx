@@ -33,6 +33,8 @@ import type { User } from '@/lib/auth';
 import { getUsers, saveUser, deleteUser } from '@/lib/auth';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/hooks/use-auth';
+import { useRouter } from 'next/navigation';
 
 type FormData = Omit<User, 'id'> & { id?: string; password?: string };
 
@@ -44,6 +46,16 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [formData, setFormData] = useState<FormData>({ email: '', name: '', role: 'admin', status: 'active', password: '' });
   const { toast } = useToast();
+  const { user: currentUser, loading: authLoading } = useAuth();
+  const router = useRouter();
+
+
+  useEffect(() => {
+    if (!authLoading && currentUser?.role !== 'superadmin') {
+      router.replace('/dashboard');
+    }
+  }, [currentUser, authLoading, router]);
+
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -64,8 +76,10 @@ export default function UsersPage() {
   }, [toast]);
 
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+    if (currentUser?.role === 'superadmin') {
+      fetchUsers();
+    }
+  }, [fetchUsers, currentUser]);
 
   const handleAdd = () => {
     setSelectedUser(null);
@@ -128,6 +142,14 @@ export default function UsersPage() {
     setIsFormOpen(false);
     setSelectedUser(null);
   };
+
+  if (authLoading || currentUser?.role !== 'superadmin') {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
