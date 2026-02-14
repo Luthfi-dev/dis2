@@ -238,7 +238,6 @@ export default function SiswaPage() {
         setStudents(result.data);
         setTotalStudents(result.total);
       }).catch((err: any) => {
-        console.error("Failed to fetch students:", err);
         toast({
           title: "Gagal Mengambil Data",
           description: "Tidak dapat mengambil data siswa.",
@@ -421,7 +420,7 @@ export default function SiswaPage() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center h-24">
-                      Tidak ada data siswa yang cocok dengan pencarian.
+                      {searchTerm ? 'Tidak ada data siswa yang cocok dengan pencarian.' : 'Tidak ada data siswa ditemukan.'}
                     </TableCell>
                   </TableRow>
                 )}

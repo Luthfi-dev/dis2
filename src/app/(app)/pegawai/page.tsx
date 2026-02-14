@@ -234,8 +234,7 @@ export default function PegawaiPage() {
       getPegawai(search, page, ITEMS_PER_PAGE).then(result => {
         setPegawaiList(result.data);
         setTotalPegawai(result.total);
-      }).catch((err) => {
-        console.error("Failed to fetch pegawai:", err);
+      }).catch((err: any) => {
         toast({
           title: "Gagal Mengambil Data",
           description: "Tidak dapat mengambil data pegawai.",
@@ -407,7 +406,7 @@ export default function PegawaiPage() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center h-24">
-                      Tidak ada data pegawai.
+                      {searchTerm ? 'Tidak ada data pegawai yang cocok dengan pencarian.' : 'Tidak ada data pegawai ditemukan.'}
                     </TableCell>
                   </TableRow>
                 )}
