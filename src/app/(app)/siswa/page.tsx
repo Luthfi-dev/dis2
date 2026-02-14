@@ -230,22 +230,18 @@ export default function SiswaPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [isResultOpen, setIsResultOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const debouncedFetchStudents = useCallback(
     debounce((search: string, page: number) => {
       setLoading(true);
-      setError(null);
       getSiswa(search, page, ITEMS_PER_PAGE).then(result => {
         setStudents(result.data);
         setTotalStudents(result.total);
       }).catch((err: any) => {
         console.error("Failed to fetch students:", err);
-        const detailedError = `Koneksi database gagal. Kemungkinan besar ada masalah pada lingkungan server aplikasi. Periksa aturan firewall keluar (egress firewall) di server/hosting Anda. Detail: ${err.message}`;
-        setError(detailedError);
         toast({
-          title: "Koneksi Gagal",
-          description: err.message,
+          title: "Gagal Mengambil Data",
+          description: "Tidak dapat mengambil data siswa.",
           variant: "destructive"
         });
       }).finally(() => {
@@ -402,16 +398,6 @@ export default function SiswaPage() {
                       <TableCell colSpan={5} className="py-4"><div className="h-4 bg-muted rounded animate-pulse"></div></TableCell>
                     </TableRow>
                   ))
-                ) : error ? (
-                    <TableRow>
-                        <TableCell colSpan={5} className="h-24 text-center">
-                            <div className="flex flex-col items-center gap-2 text-destructive">
-                                <AlertCircle className="h-8 w-8" />
-                                <span className="font-semibold">Terjadi Kesalahan</span>
-                                <p className="text-sm">{error}</p>
-                            </div>
-                        </TableCell>
-                    </TableRow>
                 ) : students.length > 0 ? (
                   students.map((student) => (
                     <TableRow key={student.id} className={isDeleting ? 'opacity-50' : ''}>

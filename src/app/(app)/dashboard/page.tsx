@@ -22,13 +22,11 @@ export default function DashboardPage() {
   const [siswaCount, setSiswaCount] = useState(0);
   const [pegawaiCount, setPegawaiCount] = useState(0);
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
     async function fetchData() {
         try {
-            setError(null);
             const [siswaResult, pegawaiResult] = await Promise.all([
                 getSiswa('', 1, 1),
                 getPegawai('', 1, 1)
@@ -43,11 +41,9 @@ export default function DashboardPage() {
         } catch (err: any) {
             console.error("Failed to load dashboard data from server", err);
             if (isMounted) {
-                const detailedError = `Koneksi database gagal. Kemungkinan besar ada masalah pada lingkungan server aplikasi. Periksa aturan firewall keluar (egress firewall) di server/hosting Anda. Detail: ${err.message}`;
-                setError(detailedError);
-                 toast({
-                    title: "Koneksi Gagal",
-                    description: err.message,
+                toast({
+                    title: "Gagal Memuat Data Dasbor",
+                    description: "Terjadi kesalahan saat memuat data.",
                     variant: "destructive"
                 });
             }
@@ -67,15 +63,6 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      {error && (
-            <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Gagal Memuat Data Dasbor</AlertTitle>
-                <AlertDescription>
-                    {error}
-                </AlertDescription>
-            </Alert>
-        )}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Selamat Datang, {user?.name}!</h1>
         <p className="text-muted-foreground">Berikut adalah ringkasan dari aplikasi {settings?.app_title || "EduArchive"} Anda.</p>

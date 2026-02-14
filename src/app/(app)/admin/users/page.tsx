@@ -39,7 +39,6 @@ type FormData = Omit<User, 'id'> & { id?: string; password?: string };
 export default function UsersPage() {
   const [userList, setUserList] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -48,17 +47,14 @@ export default function UsersPage() {
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
         const users = await getUsers();
         setUserList(users);
     } catch (err: any) {
         console.error("Failed to fetch users:", err);
-        const detailedError = `Koneksi database gagal. Kemungkinan besar ada masalah pada lingkungan server aplikasi. Periksa aturan firewall keluar (egress firewall) di server/hosting Anda. Detail: ${err.message}`;
-        setError(detailedError);
         toast({
-          title: "Koneksi Database Gagal",
-          description: err.message,
+          title: "Gagal Mengambil Data",
+          description: "Tidak dapat mengambil data pengguna.",
           variant: "destructive"
         });
         setUserList([]);
@@ -166,16 +162,6 @@ export default function UsersPage() {
                  <TableRow>
                     <TableCell colSpan={5} className="h-24 text-center">
                         <Loader2 className="mx-auto h-6 w-6 animate-spin" />
-                    </TableCell>
-                </TableRow>
-              ) : error ? (
-                <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
-                        <div className="flex flex-col items-center gap-2 text-destructive">
-                            <AlertCircle className="h-8 w-8" />
-                            <span className="font-semibold">Terjadi Kesalahan</span>
-                            <p className="text-sm">{error}</p>
-                        </div>
                     </TableCell>
                 </TableRow>
               ) : userList.length > 0 ? (

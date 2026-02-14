@@ -34,11 +34,9 @@ export function EditPegawaiForm({ pegawaiId }: { pegawaiId: string }) {
       } catch (err: any) {
         if (isMounted) {
           console.error("Fetch pegawai error:", err);
-          const detailedError = `Koneksi database gagal. Kemungkinan besar ada masalah pada lingkungan server aplikasi. Periksa aturan firewall keluar (egress firewall) di server/hosting Anda. Detail: ${err.message}`;
-          setError(detailedError);
           toast({
-              title: "Koneksi Gagal",
-              description: err.message,
+              title: "Gagal Mengambil Data",
+              description: "Tidak dapat mengambil data pegawai.",
               variant: "destructive"
           });
         }

@@ -39,11 +39,11 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
       } catch (error: any) {
         console.error("Failed to load app settings", error);
         if (isMounted) {
-          toast({
-            title: "Koneksi Database Gagal",
-            description: `Koneksi database gagal. Kemungkinan besar ada masalah pada lingkungan server aplikasi. Periksa aturan firewall keluar (egress firewall) di server/hosting Anda. Detail: ${error.message}`,
-            variant: "destructive"
-          });
+            toast({
+                title: "Gagal Memuat Pengaturan",
+                description: "Tidak dapat memuat pengaturan aplikasi.",
+                variant: "destructive"
+            });
         }
       } finally {
         if (isMounted) {
