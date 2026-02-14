@@ -86,47 +86,31 @@ export function LihatPegawaiClient({ id }: { id: string }) {
 
 
     useEffect(() => {
-        let isMounted = true;
         const fetchPegawai = async () => {
             setLoading(true);
             setError(null);
             try {
                 const result = await getPegawaiById(id);
-                if(isMounted) {
-                    if(result) {
-                        setPegawai(result);
-                        // Fetch wilayah names
-                        const kabName = await getKabupatenName(result.pegawai_alamatKabupaten);
-                        const kecName = await getKecamatanName(result.pegawai_alamatKecamatan);
-                        const desaName = await getDesaName(result.pegawai_alamatDesa);
-                        setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
-                    } else {
-                        setError("Data pegawai tidak ditemukan.");
-                    }
+                if(result) {
+                    setPegawai(result);
+                    // Fetch wilayah names
+                    const kabName = await getKabupatenName(result.pegawai_alamatKabupaten);
+                    const kecName = await getKecamatanName(result.pegawai_alamatKecamatan);
+                    const desaName = await getDesaName(result.pegawai_alamatDesa);
+                    setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
+                } else {
+                    setError("Data pegawai tidak ditemukan.");
                 }
             } catch(err: any) {
-                if (isMounted) {
-                    console.error("Fetch pegawai error:", err);
-                    toast({
-                        title: "Gagal Mengambil Data",
-                        description: "Tidak dapat mengambil data pegawai.",
-                        variant: "destructive"
-                    });
-                }
+                setError(err.message);
             } finally {
-                 if (isMounted) {
-                    setLoading(false);
-                }
+                setLoading(false);
             }
         };
         fetchPegawai();
-
-        return () => {
-            isMounted = false;
-        };
     }, [id, toast]);
 
-    const formatDate = (dateString?: string | Date) => {
+    const formatDate = (dateString?: string | Date | null) => {
       if (!dateString) return '-';
       const date = new Date(dateString);
       if (isNaN(date.getTime())) {
@@ -311,3 +295,5 @@ export function LihatPegawaiClient({ id }: { id: string }) {
     </div>
   );
 }
+
+    

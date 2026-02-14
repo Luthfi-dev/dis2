@@ -58,55 +58,39 @@ export function LihatSiswaClient({ id }: { id: string }) {
     const { toast } = useToast();
 
     useEffect(() => {
-        let isMounted = true;
         const fetchStudent = async () => {
             setLoading(true);
             setError(null);
             try {
                 const result = await getSiswaById(id);
-                if (isMounted) {
-                    if (result) {
-                        setStudent(result);
-                        // Fetch wilayah names
-                        const [kkProv, kkKab, kkKec, kkDes, domProv, domKab, domKec, domDes] = await Promise.all([
-                            getProvinceName(result.siswa_alamatKkProvinsi),
-                            getKabupatenName(result.siswa_alamatKkKabupaten),
-                            getKecamatanName(result.siswa_alamatKkKecamatan),
-                            getDesaName(result.siswa_alamatKkDesa),
-                            getProvinceName(result.siswa_domisiliProvinsi),
-                            getKabupatenName(result.siswa_domisiliKabupaten),
-                            getKecamatanName(result.siswa_domisiliKecamatan),
-                            getDesaName(result.siswa_domisiliDesa),
-                        ]);
-                        setAlamatKk({provinsi: kkProv, kabupaten: kkKab, kecamatan: kkKec, desa: kkDes});
-                        setDomisili({provinsi: domProv, kabupaten: domKab, kecamatan: domKec, desa: domDes});
-                    } else {
-                        setError("Data siswa tidak ditemukan.");
-                    }
+                if (result) {
+                    setStudent(result);
+                    // Fetch wilayah names
+                    const [kkProv, kkKab, kkKec, kkDes, domProv, domKab, domKec, domDes] = await Promise.all([
+                        getProvinceName(result.siswa_alamatKkProvinsi),
+                        getKabupatenName(result.siswa_alamatKkKabupaten),
+                        getKecamatanName(result.siswa_alamatKkKecamatan),
+                        getDesaName(result.siswa_alamatKkDesa),
+                        getProvinceName(result.siswa_domisiliProvinsi),
+                        getKabupatenName(result.siswa_domisiliKabupaten),
+                        getKecamatanName(result.siswa_domisiliKecamatan),
+                        getDesaName(result.siswa_domisiliDesa),
+                    ]);
+                    setAlamatKk({provinsi: kkProv, kabupaten: kkKab, kecamatan: kkKec, desa: kkDes});
+                    setDomisili({provinsi: domProv, kabupaten: domKab, kecamatan: domKec, desa: domDes});
+                } else {
+                    setError("Data siswa tidak ditemukan.");
                 }
             } catch (err: any) {
-                if (isMounted) {
-                    console.error("Fetch student error:", err);
-                    toast({
-                        title: "Gagal Mengambil Data",
-                        description: "Tidak dapat mengambil data siswa.",
-                        variant: "destructive"
-                    });
-                }
+                setError(err.message);
             } finally {
-                if (isMounted) {
-                    setLoading(false);
-                }
+                setLoading(false);
             }
         };
         fetchStudent();
-        
-        return () => {
-            isMounted = false;
-        };
     }, [id, toast]);
 
-    const formatDate = (dateString?: string | Date) => {
+    const formatDate = (dateString?: string | Date | null) => {
       if (!dateString) return '-';
       const date = new Date(dateString);
       if (isNaN(date.getTime())) {
@@ -381,3 +365,5 @@ export function LihatSiswaClient({ id }: { id: string }) {
     </div>
   );
 }
+
+    
