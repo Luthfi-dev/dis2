@@ -241,7 +241,7 @@ export default function SiswaPage() {
         setTotalStudents(result.total);
       }).catch((err: any) => {
         console.error("Failed to fetch students:", err);
-        const detailedError = `Gagal terhubung ke database. Pastikan variabel .env (DB_HOST, dll) sudah benar dan firewall mengizinkan koneksi. Detail: ${err.message}`;
+        const detailedError = `Koneksi database gagal. Kemungkinan besar ada masalah pada lingkungan server aplikasi. Periksa aturan firewall keluar (egress firewall) di server/hosting Anda. Detail: ${err.message}`;
         setError(detailedError);
         toast({
           title: "Koneksi Gagal",
@@ -478,5 +478,3 @@ export default function SiswaPage() {
     </div>
   );
 }
-
-    

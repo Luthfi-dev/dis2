@@ -107,7 +107,7 @@ export function LihatPegawaiClient({ id }: { id: string }) {
             } catch(err: any) {
                 if (isMounted) {
                     console.error("Fetch pegawai error:", err);
-                    const detailedError = `Gagal terhubung ke database. Pastikan variabel .env (DB_HOST, dll) sudah benar dan firewall mengizinkan koneksi. Detail: ${err.message}`;
+                    const detailedError = `Koneksi database gagal. Kemungkinan besar ada masalah pada lingkungan server aplikasi. Periksa aturan firewall keluar (egress firewall) di server/hosting Anda. Detail: ${err.message}`;
                     setError(detailedError);
                     toast({
                         title: "Koneksi Gagal",
@@ -313,5 +313,3 @@ export function LihatPegawaiClient({ id }: { id: string }) {
     </div>
   );
 }
-
-    

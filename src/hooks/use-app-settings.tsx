@@ -1,4 +1,3 @@
-
 'use client';
 import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
 import type { AppSettings } from '@/lib/actions';
@@ -42,7 +41,7 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
         if (isMounted) {
           toast({
             title: "Koneksi Database Gagal",
-            description: `Gagal terhubung ke database. Pastikan variabel .env (DB_HOST, dll) sudah benar dan firewall mengizinkan koneksi. Detail: ${error.message}`,
+            description: `Koneksi database gagal. Kemungkinan besar ada masalah pada lingkungan server aplikasi. Periksa aturan firewall keluar (egress firewall) di server/hosting Anda. Detail: ${error.message}`,
             variant: "destructive"
           });
         }
