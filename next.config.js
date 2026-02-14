@@ -1,8 +1,7 @@
+/** @type {import('next').NextConfig} */
+const path = require('path');
 
-import type {NextConfig} from 'next';
-import path from 'path';
-
-const nextConfig: NextConfig = {
+const nextConfig = {
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,
@@ -34,4 +33,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
