@@ -530,7 +530,7 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
                     <FormItem><FormLabel>Provinsi</FormLabel><FormControl>
                         <Combobox
                           options={wilayahToOptions(provinces)}
-                          value={field.value}
+                          value={field.value || ''}
                           onChange={field.onChange}
                           placeholder="Pilih Provinsi..."
                           searchPlaceholder="Cari provinsi..."
@@ -541,7 +541,7 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
                     <FormItem><FormLabel>Kabupaten</FormLabel><FormControl>
                         <Combobox
                           options={wilayahToOptions(kkKabupatens)}
-                          value={field.value}
+                          value={field.value || ''}
                           onChange={field.onChange}
                           placeholder="Pilih Kabupaten..."
                           searchPlaceholder="Cari kabupaten..."
@@ -553,7 +553,7 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
                     <FormItem><FormLabel>Kecamatan</FormLabel><FormControl>
                         <Combobox
                           options={wilayahToOptions(kkKecamatans)}
-                          value={field.value}
+                          value={field.value || ''}
                           onChange={field.onChange}
                           placeholder="Pilih Kecamatan..."
                           searchPlaceholder="Cari kecamatan..."
@@ -565,7 +565,7 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
                     <FormItem><FormLabel>Desa</FormLabel><FormControl>
                         <Combobox
                           options={wilayahToOptions(kkDesas)}
-                          value={field.value}
+                          value={field.value || ''}
                           onChange={field.onChange}
                           placeholder="Pilih Desa..."
                           searchPlaceholder="Cari desa..."
@@ -583,7 +583,7 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
                     <FormItem><FormLabel>Provinsi</FormLabel><FormControl>
                         <Combobox
                           options={wilayahToOptions(provinces)}
-                          value={field.value}
+                          value={field.value || ''}
                           onChange={field.onChange}
                           placeholder="Pilih Provinsi..."
                           searchPlaceholder="Cari provinsi..."
@@ -594,7 +594,7 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
                     <FormItem><FormLabel>Kabupaten</FormLabel><FormControl>
                         <Combobox
                            options={wilayahToOptions(domisiliKabupatens)}
-                           value={field.value}
+                           value={field.value || ''}
                            onChange={field.onChange}
                            placeholder="Pilih Kabupaten..."
                            searchPlaceholder="Cari kabupaten..."
@@ -606,7 +606,7 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
                     <FormItem><FormLabel>Kecamatan</FormLabel><FormControl>
                         <Combobox
                           options={wilayahToOptions(domisiliKecamatans)}
-                          value={field.value}
+                          value={field.value || ''}
                           onChange={field.onChange}
                           placeholder="Pilih Kecamatan..."
                           searchPlaceholder="Cari kecamatan..."
@@ -618,7 +618,7 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
                     <FormItem><FormLabel>Desa</FormLabel><FormControl>
                         <Combobox
                           options={wilayahToOptions(domisiliDesas)}
-                          value={field.value}
+                          value={field.value || ''}
                           onChange={field.onChange}
                           placeholder="Pilih Desa..."
                           searchPlaceholder="Cari desa..."

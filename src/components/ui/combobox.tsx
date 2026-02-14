@@ -22,7 +22,7 @@ import {
 
 type ComboboxProps = {
     options: { value: string; label: string }[];
-    value: string;
+    value?: string;
     onChange: (value: string) => void;
     placeholder: string;
     searchPlaceholder: string;

@@ -521,7 +521,7 @@ function DataIdentitasPegawaiForm({ pegawaiData }: { pegawaiData?: Partial<Pegaw
                     <FormItem><FormLabel>Kabupaten</FormLabel><FormControl>
                         <Combobox
                           options={wilayahToOptions(allKabupatens)}
-                          value={field.value}
+                          value={field.value || ''}
                           onChange={field.onChange}
                           placeholder="Pilih Kabupaten..."
                           searchPlaceholder="Cari kabupaten..."
@@ -532,7 +532,7 @@ function DataIdentitasPegawaiForm({ pegawaiData }: { pegawaiData?: Partial<Pegaw
                     <FormItem><FormLabel>Kecamatan</FormLabel><FormControl>
                         <Combobox
                           options={wilayahToOptions(kecamatans)}
-                          value={field.value}
+                          value={field.value || ''}
                           onChange={field.onChange}
                           placeholder="Pilih Kecamatan..."
                           searchPlaceholder="Cari kecamatan..."
@@ -544,7 +544,7 @@ function DataIdentitasPegawaiForm({ pegawaiData }: { pegawaiData?: Partial<Pegaw
                     <FormItem><FormLabel>Desa</FormLabel><FormControl>
                         <Combobox
                           options={wilayahToOptions(desas)}
-                          value={field.value}
+                          value={field.value || ''}
                           onChange={field.onChange}
                           placeholder="Pilih Desa..."
                           searchPlaceholder="Cari desa..."
