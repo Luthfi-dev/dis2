@@ -184,7 +184,7 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
                         <InfoRow label="Nama Lengkap" value={pegawai.pegawai_nama} icon={User} />
                         <InfoRow label="Jenis Kelamin" value={pegawai.pegawai_jenisKelamin} icon={Users} />
-                        <InfoRow label="Tempat, Tgl Lahir" value={`${pegawai.pegawai_tempatLahir}, ${formatDate(pegawai.pegawai_tanggalLahir)}`} icon={Calendar} />
+                        <InfoRow label="Tempat, Tgl Lahir" value={`${pegawai.pegawai_tempatLahir || ''}, ${formatDate(pegawai.pegawai_tanggalLahir)}`} icon={Calendar} />
                         <InfoRow label="NIP" value={pegawai.pegawai_nip} icon={FileText} />
                         <InfoRow label="NUPTK" value={pegawai.pegawai_nuptk} icon={FileText} />
                         <InfoRow label="NRG" value={pegawai.pegawai_nrg} icon={FileText} />
@@ -255,5 +255,3 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
     </div>
   );
 }
-
-    

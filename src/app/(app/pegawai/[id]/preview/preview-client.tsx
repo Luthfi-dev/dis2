@@ -5,7 +5,7 @@ import { Pegawai } from '@/lib/pegawai-data';
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowLeft, Printer, User, Calendar, MapPin, Briefcase, Home, Users, HeartHandshake, School, GraduationCap, FileText, CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowLeft, Printer, User, Calendar, MapPin, Briefcase, Home, Users, HeartHandshake, School, GraduationCap, FileText, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { getDesaName, getKecamatanName, getKabupatenName } from '@/lib/wilayah';
+import { useToast } from '@/hooks/use-toast';
 
 function InfoRow({ label, value, icon, className }: { label: string, value?: React.ReactNode, icon?: React.ElementType, className?: string }) {
     const Icon = icon;
@@ -59,22 +60,64 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
   const [pegawai, setPegawai] = useState<Pegawai | null>(null);
   const [loading, setLoading] = useState(true);
   const [alamat, setAlamat] = useState({kabupaten: '', kecamatan: '', desa: ''});
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchPegawai = async () => {
-        const result = await getPegawaiById(id);
-        if(result) {
-            setPegawai(result);
-            const kabName = await getKabupatenName(result.pegawai_alamatKabupaten);
-            const kecName = await getKecamatanName(result.pegawai_alamatKecamatan);
-            const desaName = await getDesaName(result.pegawai_alamatDesa);
-            setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
+        setLoading(true);
+        setError(null);
+        try {
+            const result = await getPegawaiById(id);
+            if(result) {
+                setPegawai(result);
+                const kabName = await getKabupatenName(result.pegawai_alamatKabupaten);
+                const kecName = await getKecamatanName(result.pegawai_alamatKecamatan);
+                const desaName = await getDesaName(result.pegawai_alamatDesa);
+                setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
+            } else {
+                setError("Data pegawai tidak ditemukan.");
+            }
+        } catch(err: any) {
+            setError("Gagal memuat data. Pastikan koneksi ke server berhasil.");
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
     fetchPegawai();
   }, [id]);
 
+  const formatDate = (dateString?: string | Date | null) => {
+      if (!dateString) return '-';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+          return '-';
+      }
+      return new Intl.DateTimeFormat('id-ID', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'UTC'
+      }).format(date);
+  }
+
+  if (error) {
+    return (
+        <div className="bg-gray-100 dark:bg-gray-900 p-4 md:p-8 print:bg-white">
+            <div className="max-w-4xl mx-auto bg-white dark:bg-card rounded-xl shadow-2xl p-8 flex flex-col items-center justify-center text-center">
+                <AlertCircle className="w-16 h-16 text-destructive mb-4" />
+                <h2 className="text-2xl font-bold text-destructive">Gagal Memuat Preview</h2>
+                <p className="text-muted-foreground mt-2 mb-6">{error}</p>
+                <Button asChild variant="outline" className="print:hidden">
+                    <Link href="/pegawai">
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Kembali ke Daftar
+                    </Link>
+                </Button>
+            </div>
+        </div>
+    )
+  }
 
   if (loading) {
       return (
@@ -94,10 +137,6 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
     notFound();
   }
 
-  const formatDate = (dateString?: string | Date) => {
-      if (!dateString) return '-';
-      return new Date(dateString).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
-  }
   
   const pegawaiStatus = pegawai.status === 'Lengkap';
 
@@ -146,7 +185,7 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
                         <InfoRow label="Nama Lengkap" value={pegawai.pegawai_nama} icon={User} />
                         <InfoRow label="Jenis Kelamin" value={pegawai.pegawai_jenisKelamin} icon={Users} />
-                        <InfoRow label="Tempat, Tgl Lahir" value={`${pegawai.pegawai_tempatLahir}, ${formatDate(pegawai.pegawai_tanggalLahir)}`} icon={Calendar} />
+                        <InfoRow label="Tempat, Tgl Lahir" value={`${pegawai.pegawai_tempatLahir || ''}, ${formatDate(pegawai.pegawai_tanggalLahir)}`} icon={Calendar} />
                         <InfoRow label="NIP" value={pegawai.pegawai_nip} icon={FileText} />
                         <InfoRow label="NUPTK" value={pegawai.pegawai_nuptk} icon={FileText} />
                         <InfoRow label="NRG" value={pegawai.pegawai_nrg} icon={FileText} />

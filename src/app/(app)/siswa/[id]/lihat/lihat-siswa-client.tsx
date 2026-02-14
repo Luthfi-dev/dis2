@@ -82,13 +82,13 @@ export function LihatSiswaClient({ id }: { id: string }) {
                     setError("Data siswa tidak ditemukan.");
                 }
             } catch (err: any) {
-                setError(err.message);
+                setError("Gagal memuat data. Pastikan koneksi ke server berhasil.");
             } finally {
                 setLoading(false);
             }
         };
         fetchStudent();
-    }, [id, toast]);
+    }, [id]);
 
     const formatDate = (dateString?: string | Date | null) => {
       if (!dateString) return '-';

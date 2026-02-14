@@ -60,13 +60,13 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                 setError("Data siswa tidak ditemukan.");
             }
         } catch(err: any) {
-            setError(err.message);
+            setError("Gagal memuat data. Pastikan koneksi ke server berhasil.");
         } finally {
             setLoading(false);
         }
     };
     fetchStudent();
-  }, [id, toast]);
+  }, [id]);
   
   if (error) {
     return (
@@ -168,7 +168,7 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                         <InfoRow label="NIS" value={student.siswa_nis} icon={User} />
                         <InfoRow label="NISN" value={student.siswa_nisn} icon={User} />
                         <InfoRow label="Jenis Kelamin" value={student.siswa_jenisKelamin} icon={Users} />
-                        <InfoRow label="Tempat, Tgl Lahir" value={`${student.siswa_tempatLahir}, ${formatDate(student.siswa_tanggalLahir)}`} icon={Calendar} />
+                        <InfoRow label="Tempat, Tgl Lahir" value={`${student.siswa_tempatLahir || ''}, ${formatDate(student.siswa_tanggalLahir)}`} icon={Calendar} />
                         <InfoRow label="Agama" value={student.siswa_agama} icon={BookOpen} />
                         <InfoRow label="Kewarganegaraan" value={student.siswa_kewarganegaraan} icon={Map} />
                         <InfoRow label="Jumlah Saudara" value={student.siswa_jumlahSaudara} icon={Users}/>
@@ -288,5 +288,3 @@ export function PreviewSiswaClient({ id }: { id: string }) {
     </div>
   );
 }
-
-    
