@@ -29,7 +29,7 @@ function DetailItem({ label, value, icon }: { label: string; value: React.ReactN
   );
 }
 
-function DocumentItem({ label, document }: { label: string; document?: { fileName: string, fileURL?: string }}) {
+function DocumentItem({ label, document }: { label: string; document?: { fileName: string, fileURL?: string } | null }) {
     if (!document || !document.fileName) {
         return <DetailItem label={label} value="-" icon={FileIcon} />;
     }
@@ -295,5 +295,3 @@ export function LihatPegawaiClient({ id }: { id: string }) {
     </div>
   );
 }
-
-    
