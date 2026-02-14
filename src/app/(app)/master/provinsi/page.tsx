@@ -1,1 +1,3 @@
-// This file is deleted.
+export default function MasterProvinsiPage() {
+  return null;
+}

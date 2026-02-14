@@ -1,1 +1,3 @@
-// This file is deleted.
+export default function MasterKabupatenPage() {
+  return null;
+}

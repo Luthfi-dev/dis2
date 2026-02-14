@@ -1,1 +1,3 @@
-// This file is deleted.
+export default function MasterKecamatanPage() {
+  return null;
+}
