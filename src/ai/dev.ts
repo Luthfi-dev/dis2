@@ -1,4 +1,3 @@
-import { config } from 'dotenv';
-config();
 
-import '@/ai/flows/suggest-upload-category.ts';
+// AI functionality has been disabled to reduce project footprint and security risk.
+export {};
