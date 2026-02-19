@@ -1,18 +1,17 @@
-
 'use client';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/use-auth';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Label } from '../../../components/ui/label';
+import { useToast } from '../../../hooks/use-toast';
+import { useAuth } from '../../../hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { Loader2, GraduationCap } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAppSettings } from '@/hooks/use-app-settings';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
+import { useAppSettings } from '../../../hooks/use-app-settings';
 import Image from 'next/image';
 
 const loginSchema = z.object({
@@ -94,7 +93,7 @@ export default function LoginPage() {
           <CardHeader className="text-center">
              <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 relative overflow-hidden">
                 {settings?.app_logo_url ? (
-                    <Image src={settings.app_logo_url} alt="Logo Aplikasi" layout="fill" objectFit="cover" className="rounded-full" />
+                    <Image src={settings.app_logo_url} alt="Logo Aplikasi" style={{ objectFit: 'cover' }} fill className="rounded-full" />
                 ) : (
                     <GraduationCap className="h-8 w-8 text-primary" />
                 )}
@@ -146,5 +145,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    

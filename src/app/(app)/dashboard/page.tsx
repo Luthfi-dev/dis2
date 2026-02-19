@@ -1,19 +1,18 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../../components/ui/card';
 import { Users, Briefcase, ArrowRight, History, BookCopy, AlertCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { useAuth } from '@/hooks/use-auth';
-import { getSiswa, getPegawai } from '@/lib/actions';
-import { getActivities, Activity } from '@/lib/activity-log';
+import { useAuth } from '../../../hooks/use-auth';
+import { getSiswa, getPegawai } from '../../../lib/actions';
+import { getActivities, Activity } from '../../../lib/activity-log';
 import { formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { useAppSettings } from '@/hooks/use-app-settings';
-import { useToast } from '@/hooks/use-toast';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useAppSettings } from '../../../hooks/use-app-settings';
+import { useToast } from '../../../hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '../../../components/ui/alert';
 
 export default function DashboardPage() {
   const { user } = useAuth();

@@ -1,14 +1,13 @@
-
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Button } from '../../../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../../../components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from '../../../components/ui/dropdown-menu';
 import { MoreHorizontal, PlusCircle, Eye, FilePen, Trash2, Search, FileSearch, Upload, Download, Loader2, ChevronLeft, ChevronRight, AlertCircle, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { Pegawai } from '@/lib/pegawai-data';
-import { Badge } from '@/components/ui/badge';
+import { Pegawai } from '../../../lib/pegawai-data';
+import { Badge } from '../../../components/ui/badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +17,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "../../../components/ui/alert-dialog"
 import {
   Dialog,
   DialogContent,
@@ -28,13 +27,13 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose,
-} from "@/components/ui/dialog"
+} from "../../../components/ui/dialog"
 import React, { useState, useEffect, useMemo, useTransition, useCallback } from 'react';
-import { Input } from '@/components/ui/input';
-import { getPegawai, deletePegawai, importData, ImportResult } from '@/lib/actions';
-import { useToast } from '@/hooks/use-toast';
+import { Input } from '../../../components/ui/input';
+import { getPegawai, deletePegawai, importData, ImportResult } from '../../../lib/actions';
+import { useToast } from '../../../hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { cn } from '@/lib/utils';
+import { cn } from '../../../lib/utils';
 import { debounce } from 'lodash';
 
 function ActionMenu({ pegawai, onDelete }: { pegawai: Pegawai, onDelete: (id: string) => void }) {
