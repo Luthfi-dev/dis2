@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -16,7 +15,6 @@ import { useEffect, useTransition } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import Image from 'next/image';
 import { useAppSettings } from '@/hooks/use-app-settings';
-import type { AppSettings } from '@/lib/actions';
 
 const settingsSchema = z.object({
     app_title: z.string().min(1, 'Judul aplikasi wajib diisi.'),
@@ -48,20 +46,16 @@ export default function AdminSettingsPage() {
     const [isPending, startTransition] = useTransition();
     const { toast } = useToast();
 
-    const { register, handleSubmit, formState: { errors }, reset, setValue, watch, formState: {isSubmitting} } = useForm<SettingsFormData>({
+    const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<SettingsFormData>({
         resolver: zodResolver(settingsSchema),
     });
     
     const logoUrl = watch('app_logo_url');
 
     useEffect(() => {
-        let isMounted = true;
-        if (!authLoading && isMounted) {
-            if (user?.role !== 'superadmin') {
-                router.replace('/dashboard');
-            }
+        if (!authLoading && user?.role !== 'superadmin') {
+            router.replace('/dashboard');
         }
-        return () => { isMounted = false; };
     }, [user, authLoading, router]);
 
     useEffect(() => {
@@ -104,11 +98,7 @@ export default function AdminSettingsPage() {
     }
 
     if (user?.role !== 'superadmin') {
-        return (
-            <div className="flex h-screen items-center justify-center">
-                <p>Anda tidak memiliki akses ke halaman ini.</p>
-            </div>
-        );
+        return null;
     }
 
     return (
@@ -129,7 +119,7 @@ export default function AdminSettingsPage() {
                              <div className="flex items-center gap-4">
                                 <div className="w-20 h-20 rounded-lg bg-muted flex items-center justify-center border relative">
                                     {logoUrl ? (
-                                        <Image src={logoUrl} alt="Logo Aplikasi" layout="fill" objectFit="contain" />
+                                        <Image src={logoUrl} alt="Logo Aplikasi" fill style={{ objectFit: 'contain' }} />
                                     ) : (
                                         <ImageIcon className="w-10 h-10 text-muted-foreground" />
                                     )}
