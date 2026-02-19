@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -24,8 +23,7 @@ function Calendar({
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
         caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium hidden",
-        caption_dropdowns: "flex gap-2",
+        caption_label: "text-sm font-medium",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
@@ -55,19 +53,17 @@ function Calendar({
         day_hidden: "invisible",
         ...classNames,
       }}
-      captionLayout="dropdown-buttons"
-      fromYear={new Date().getFullYear() - 100}
-      toYear={new Date().getFullYear()}
+      captionLayout="dropdown"
+      startMonth={new Date(new Date().getFullYear() - 100, 0)}
+      endMonth={new Date()}
       components={{
-        IconLeft: ({ className, ...props }) => (
-          <ChevronLeft className={cn("h-4 w-4", className)} {...props} />
-        ),
-        IconRight: ({ className, ...props }) => (
-          <ChevronRight className={cn("h-4 w-4", className)} {...props} />
-        ),
+        Chevron: ({ orientation }) => {
+          const Icon = orientation === "left" ? ChevronLeft : ChevronRight;
+          return <Icon className="h-4 w-4" />;
+        },
       }}
-      // Set defaultMonth to the selected date to open the calendar at the correct month
-      defaultMonth={props.selected as Date | undefined}
+      // Set month to the selected date to open the calendar at the correct month
+      month={props.selected as Date | undefined}
       {...props}
     />
   )
