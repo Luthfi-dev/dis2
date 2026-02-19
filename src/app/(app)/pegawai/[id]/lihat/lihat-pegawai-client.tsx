@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../../components/ui/card';
 import { Button } from '../../../../../components/ui/button';
 import Link from 'next/link';
-import { FilePen, ArrowLeft, Building, User, Calendar, Mail, Phone, MapPin, Droplet, Stethoscope, BookOpen, File as FileIcon, Image as ImageIcon, Users, Languages, GraduationCap, School, HeartHandshake, Home, Briefcase, FileText, AlertCircle } from 'lucide-react';
+import { FilePen, ArrowLeft, User, Calendar, MapPin, BookOpen, File as FileIcon, Image as ImageIcon, Users, HeartHandshake, Home, Briefcase, AlertCircle } from 'lucide-react';
 import { Badge } from '../../../../../components/ui/badge';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '../../../../../components/ui/skeleton';

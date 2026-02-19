@@ -1,5 +1,4 @@
-
-import { PegawaiForm } from '@/components/pegawai-form';
+import { PegawaiForm } from '../../../../components/pegawai-form';
 
 export default function TambahPegawaiPage() {
   return (

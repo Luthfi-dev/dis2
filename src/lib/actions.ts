@@ -1,11 +1,10 @@
-
 'use server';
 
 import type { Siswa } from './data';
 import type { Pegawai } from './pegawai-data';
 import { sanitizeAndFormatData } from './utils';
-import type { PegawaiFormData } from '@/lib/pegawai-data';
-import type { StudentFormData } from '@/lib/student-data-t';
+import type { PegawaiFormData } from './pegawai-data';
+import type { StudentFormData } from './student-data-t';
 import pool from './db';
 import { omit, isEmpty } from 'lodash';
 import Excel from 'exceljs';
@@ -510,5 +509,3 @@ const pegawaiHeaders = [
     { header: 'NRG', key: 'pegawai_nrg' },
     { header: 'Bidang Studi', key: 'pegawai_bidangStudi' },
 ];
-
-    

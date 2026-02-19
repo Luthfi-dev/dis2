@@ -1,4 +1,4 @@
-import { StudentForm } from '@/components/student-form';
+import { StudentForm } from '../../../../components/student-form';
 
 export default function TambahSiswaPage() {
   return (
