@@ -1,14 +1,13 @@
-
 'use client';
-import { StudentForm } from '@/components/student-form';
-import { getSiswaById } from '@/lib/actions';
+import { StudentForm } from '../../../../../components/student-form';
+import { getSiswaById } from '../../../../../lib/actions';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import type { Siswa } from '@/lib/data';
-import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '../../../../../components/ui/skeleton';
+import type { Siswa } from '../../../../../lib/data';
+import { useToast } from '../../../../../hooks/use-toast';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../../../../../components/ui/button';
 import Link from 'next/link';
 
 export function EditStudentForm({ studentId }: { studentId: string }) {
@@ -83,7 +82,6 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
   }
 
   if (!student) {
-    // This case should be handled by the error state, but as a fallback:
     notFound();
   }
   

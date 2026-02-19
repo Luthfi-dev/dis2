@@ -1,14 +1,13 @@
-
 'use client';
-import { PegawaiForm } from '@/components/pegawai-form';
-import { getPegawaiById } from '@/lib/actions';
+import { PegawaiForm } from '../../../../../components/pegawai-form';
+import { getPegawaiById } from '../../../../../lib/actions';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import type { Pegawai } from '@/lib/pegawai-data';
-import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '../../../../../components/ui/skeleton';
+import type { Pegawai } from '../../../../../lib/pegawai-data';
+import { useToast } from '../../../../../hooks/use-toast';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../../../../../components/ui/button';
 import Link from 'next/link';
 
 export function EditPegawaiForm({ pegawaiId }: { pegawaiId: string }) {

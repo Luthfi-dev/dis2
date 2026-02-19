@@ -78,13 +78,27 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
                 setError("Data pegawai tidak ditemukan.");
             }
         } catch(err: any) {
-            setError(err.message);
+            setError("Gagal memuat data. Pastikan koneksi ke server berhasil.");
         } finally {
             setLoading(false);
         }
     };
     fetchPegawai();
   }, [id]);
+
+  const formatDate = (dateString?: string | Date | null) => {
+      if (!dateString) return '-';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+          return '-';
+      }
+      return new Intl.DateTimeFormat('id-ID', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'UTC'
+      }).format(date);
+  }
 
   if (error) {
     return (
@@ -122,19 +136,6 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
     notFound();
   }
 
-  const formatDate = (dateString?: string | Date | null) => {
-      if (!dateString) return '-';
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) {
-          return '-';
-      }
-      return new Intl.DateTimeFormat('id-ID', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-        timeZone: 'UTC'
-      }).format(date);
-  }
   
   const pegawaiStatus = pegawai.status === 'Lengkap';
 

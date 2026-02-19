@@ -1,6 +1,5 @@
-
 'use client';
-import { useAppSettings } from "@/hooks/use-app-settings";
+import { useAppSettings } from "../hooks/use-app-settings";
 import { useEffect } from "react";
 
 export function AppMetadata() {
@@ -30,6 +29,5 @@ export function AppMetadata() {
         return () => { isMounted = false; };
     }, [settings]);
 
-    // This component doesn't render anything to the DOM itself.
     return null;
 }

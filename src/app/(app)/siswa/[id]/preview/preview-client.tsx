@@ -1,19 +1,18 @@
-
 'use client';
-import { getSiswaById } from '@/lib/actions';
-import { Siswa } from '@/lib/data';
+import { getSiswaById } from '../../../../../lib/actions';
+import { Siswa } from '../../../../../lib/data';
 import { notFound } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { Button } from '../../../../../components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, Printer, User, Calendar, MapPin, Droplet, Stethoscope, BookOpen, Building, Phone, Home, Users, Languages, HeartHandshake, Map, School, GraduationCap, History, CheckCircle2, XCircle, FileText, Briefcase, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { getDesaName, getKecamatanName, getKabupatenName, getProvinceName } from '@/lib/wilayah';
-import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '../../../../../components/ui/skeleton';
+import { Separator } from '../../../../../components/ui/separator';
+import { Badge } from '../../../../../components/ui/badge';
+import { getDesaName, getKecamatanName, getKabupatenName, getProvinceName } from '../../../../../lib/wilayah';
+import { cn } from '../../../../../lib/utils';
+import { useToast } from '../../../../../hooks/use-toast';
 
 function InfoRow({ label, value, icon, className }: { label: string, value?: React.ReactNode, icon?: React.ElementType, className?: string }) {
     const Icon = icon;

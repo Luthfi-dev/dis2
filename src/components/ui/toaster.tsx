@@ -1,7 +1,6 @@
-
 "use client"
 
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "../../hooks/use-toast"
 import {
   Toast,
   ToastClose,
@@ -9,11 +8,10 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from "@/components/ui/toast"
+} from "./toast"
 import { Copy } from "lucide-react"
 import { Button } from "./button"
-import { ScrollArea } from "./scroll-area"
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 import { Input } from "./input"
 
 export function Toaster() {

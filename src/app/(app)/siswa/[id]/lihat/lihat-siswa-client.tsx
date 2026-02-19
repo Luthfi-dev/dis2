@@ -1,19 +1,18 @@
-
 'use client';
-import { getSiswaById } from '@/lib/actions';
-import { Siswa } from '@/lib/data';
+import { getSiswaById } from '../../../../../lib/actions';
+import { Siswa } from '../../../../../lib/data';
 import { notFound } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../../../components/ui/card';
+import { Button } from '../../../../../components/ui/button';
 import Link from 'next/link';
 import { FilePen, ArrowLeft, Building, User, Calendar, Mail, Phone, MapPin, Droplet, Stethoscope, BookOpen, File as FileIcon, Image as ImageIcon, Users, Languages, GraduationCap, School, HeartHandshake, Home, Briefcase, FileText, AlertCircle } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '../../../../../components/ui/badge';
 import { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '../../../../../components/ui/skeleton';
 import Image from 'next/image';
-import { getDesaName, getKecamatanName, getKabupatenName, getProvinceName } from '@/lib/wilayah';
-import { Separator } from '@/components/ui/separator';
-import { useToast } from '@/hooks/use-toast';
+import { getDesaName, getKecamatanName, getKabupatenName, getProvinceName } from '../../../../../lib/wilayah';
+import { Separator } from '../../../../../components/ui/separator';
+import { useToast } from '../../../../../hooks/use-toast';
 
 function DetailItem({ label, value, icon }: { label: string; value: React.ReactNode; icon: React.ElementType }) {
   const Icon = icon;

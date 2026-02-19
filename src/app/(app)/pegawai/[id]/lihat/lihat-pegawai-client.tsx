@@ -101,7 +101,7 @@ export function LihatPegawaiClient({ id }: { id: string }) {
                     setError("Data pegawai tidak ditemukan.");
                 }
             } catch(err: any) {
-                setError(err.message);
+                setError("Gagal memuat data. Pastikan koneksi ke server berhasil.");
             } finally {
                 setLoading(false);
             }
