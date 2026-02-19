@@ -64,7 +64,6 @@ export function LihatSiswaClient({ id }: { id: string }) {
                 const result = await getSiswaById(id);
                 if (result) {
                     setStudent(result);
-                    // Fetch wilayah names
                     const [kkProv, kkKab, kkKec, kkDes, domProv, domKab, domKec, domDes] = await Promise.all([
                         getProvinceName(result.siswa_alamatKkProvinsi),
                         getKabupatenName(result.siswa_alamatKkKabupaten),
@@ -80,7 +79,7 @@ export function LihatSiswaClient({ id }: { id: string }) {
                 } else {
                     setError("Data siswa tidak ditemukan.");
                 }
-            } catch (err: any) {
+            } catch(err: any) {
                 setError("Gagal memuat data. Pastikan koneksi ke server berhasil.");
             } finally {
                 setLoading(false);

@@ -42,7 +42,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
             const result = await getSiswaById(id);
             if (result) {
                 setStudent(result);
-                // Fetch wilayah names
                 const [kkProv, kkKab, kkKec, kkDes, domProv, domKab, domKec, domDes] = await Promise.all([
                     getProvinceName(result.siswa_alamatKkProvinsi),
                     getKabupatenName(result.siswa_alamatKkKabupaten),
@@ -159,7 +158,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
             <Separator className="my-8" />
             
             <div className="space-y-10">
-                {/* Keterangan Pribadi */}
                 <section>
                     <h3 className="font-bold text-xl mb-4 border-b-2 border-primary pb-2 text-primary">A. Keterangan Pribadi Siswa</h3>
                     <div className="space-y-3">
@@ -177,7 +175,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                     </div>
                 </section>
                 
-                {/* Keterangan Tempat Tinggal */}
                  <section>
                     <h3 className="font-bold text-xl mb-4 border-b-2 border-primary pb-2 text-primary">B. Keterangan Tempat Tinggal</h3>
                     <div className="space-y-4">
@@ -198,7 +195,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                     </div>
                 </section>
 
-                {/* Keterangan Kesehatan */}
                 <section>
                     <h3 className="font-bold text-xl mb-4 border-b-2 border-primary pb-2 text-primary">C. Keterangan Kesehatan</h3>
                     <div className="space-y-3">
@@ -208,7 +204,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                     </div>
                 </section>
 
-                {/* Keterangan Orang Tua */}
                  <section>
                     <h3 className="font-bold text-xl mb-4 border-b-2 border-primary pb-2 text-primary">D. Keterangan Orang Tua</h3>
                     <div className="space-y-4">
@@ -227,7 +222,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                     </div>
                 </section>
 
-                 {/* Keterangan Wali */}
                  <section>
                     <h3 className="font-bold text-xl mb-4 border-b-2 border-primary pb-2 text-primary">E. Keterangan Wali</h3>
                     <div className="space-y-3">
@@ -238,7 +232,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                     </div>
                 </section>
 
-                {/* Perkembangan Siswa */}
                 <section>
                     <h3 className="font-bold text-xl mb-4 border-b-2 border-primary pb-2 text-primary">F. Perkembangan Siswa</h3>
                      <div className="space-y-4">
@@ -257,7 +250,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                     </div>
                 </section>
                 
-                {/* Meninggalkan Sekolah */}
                 <section>
                     <h3 className="font-bold text-xl mb-4 border-b-2 border-primary pb-2 text-primary">G. Meninggalkan Sekolah</h3>
                      <div className="space-y-4">

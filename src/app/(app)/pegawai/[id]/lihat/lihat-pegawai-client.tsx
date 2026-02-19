@@ -92,7 +92,6 @@ export function LihatPegawaiClient({ id }: { id: string }) {
                 const result = await getPegawaiById(id);
                 if(result) {
                     setPegawai(result);
-                    // Fetch wilayah names
                     const kabName = await getKabupatenName(result.pegawai_alamatKabupaten);
                     const kecName = await getKecamatanName(result.pegawai_alamatKecamatan);
                     const desaName = await getDesaName(result.pegawai_alamatDesa);
