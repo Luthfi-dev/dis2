@@ -63,9 +63,9 @@ const pegawaiDummy = {
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { type: string } }
+    { params }: { params: Promise<{ type: string }> }
 ) {
-    const type = params.type;
+    const { type } = await params;
 
     let headers, dummyData, fileName;
 
@@ -93,17 +93,15 @@ export async function GET(
             cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
-                fgColor: { argb: 'FF3F51B5' }, // Blue color from theme
+                fgColor: { argb: 'FF3F51B5' },
             };
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
         });
 
         worksheet.addRow(dummyData);
 
-        // Write to buffer
         const buffer = await workbook.xlsx.writeBuffer();
 
-        // Create response
         const response = new NextResponse(buffer);
         response.headers.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         response.headers.set('Content-Disposition', `attachment; filename=${fileName}`);

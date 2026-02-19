@@ -3,7 +3,7 @@
 
 import { PreviewSiswaClient } from './preview-client';
 
-export default async function PreviewSiswaPage({ params }: { params: { id: string } }) {
-  const id = params.id;
+export default async function PreviewSiswaPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   return <PreviewSiswaClient id={id} />;
 }

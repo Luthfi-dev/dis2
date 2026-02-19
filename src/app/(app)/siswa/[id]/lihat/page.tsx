@@ -3,7 +3,7 @@
 
 import { LihatSiswaClient } from './lihat-siswa-client';
 
-export default async function LihatSiswaPage({ params }: { params: { id: string } }) {
-  const id = params.id;
+export default async function LihatSiswaPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   return <LihatSiswaClient id={id} />;
 }

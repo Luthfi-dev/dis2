@@ -1,5 +1,4 @@
 
-// src/app/api/dev-uploads/[...path]/route.ts
 import {NextRequest, NextResponse} from 'next/server';
 import path from 'path';
 import fs from 'fs';
@@ -9,13 +8,14 @@ const UPLOADS_DIR = path.join(process.cwd(), '..', 'uploads');
 
 export async function GET(
   req: NextRequest,
-  {params}: {params: {path: string[]}}
+  {params}: {params: Promise<{path: string[]}>}
 ) {
   if (process.env.NODE_ENV === 'production') {
     return new NextResponse('Not found', {status: 404});
   }
 
-  const safePath = path.join(...params.path).replace(/\.\.\//g, '');
+  const { path: pathSegments } = await params;
+  const safePath = path.join(...pathSegments).replace(/\.\.\//g, '');
   const filePath = path.join(UPLOADS_DIR, safePath);
 
   const resolvedPath = path.resolve(filePath);

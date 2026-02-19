@@ -1,3 +1,3 @@
 
-// AI functionality has been disabled to reduce project footprint and security risk.
+// AI dev tools disabled.
 export {};

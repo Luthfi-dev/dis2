@@ -1,5 +1,4 @@
 
-// src/app/api/uploads/[...path]/route.ts
 import {NextRequest, NextResponse} from 'next/server';
 import path from 'path';
 import fs from 'fs';
@@ -9,13 +8,12 @@ const UPLOADS_DIR = path.join(process.cwd(), '..', 'uploads');
 
 export async function GET(
   req: NextRequest,
-  {params}: {params: {path: string[]}}
+  {params}: {params: Promise<{path: string[]}>}
 ) {
-  // Gabungkan path dan bersihkan dari upaya traversal
-  const safePath = path.join(...params.path).replace(/\.\.\//g, '');
+  const { path: pathSegments } = await params;
+  const safePath = path.join(...pathSegments).replace(/\.\.\//g, '');
   const filePath = path.join(UPLOADS_DIR, safePath);
 
-  // Validasi akhir: Pastikan file yang diminta benar-benar ada di dalam UPLOADS_DIR
   const resolvedPath = path.resolve(filePath);
   const resolvedUploadsDir = path.resolve(UPLOADS_DIR);
 
