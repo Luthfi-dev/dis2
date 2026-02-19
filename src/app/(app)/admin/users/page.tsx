@@ -1,11 +1,10 @@
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Button } from '../../../../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../../../components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../../components/ui/table';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from '../../../../components/ui/dropdown-menu';
 import { MoreHorizontal, PlusCircle, FilePen, Trash2, Loader2, AlertCircle } from 'lucide-react';
 import {
   AlertDialog,
@@ -16,7 +15,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "../../../../components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -25,15 +24,15 @@ import {
   DialogTitle,
   DialogFooter,
   DialogClose,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import type { User } from '@/lib/auth';
-import { getUsers, saveUser, deleteUser } from '@/lib/auth';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/hooks/use-auth';
+} from "../../../../components/ui/dialog";
+import { Input } from "../../../../components/ui/input";
+import { Label } from "../../../../components/ui/label";
+import { useToast } from "../../../../hooks/use-toast";
+import type { User } from '../../../../lib/auth';
+import { getUsers, saveUser, deleteUser } from '../../../../lib/auth';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
+import { Badge } from '../../../../components/ui/badge';
+import { useAuth } from '../../../../hooks/use-auth';
 import { useRouter } from 'next/navigation';
 
 type FormData = Omit<User, 'id'> & { id?: string; password?: string };

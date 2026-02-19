@@ -1,19 +1,18 @@
-
 'use client';
-import { getPegawaiById } from '@/lib/actions';
-import { Pegawai } from '@/lib/pegawai-data';
+import { getPegawaiById } from '../../../../../lib/actions';
+import { Pegawai } from '../../../../../lib/pegawai-data';
 import { notFound } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { Button } from '../../../../../components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, Printer, User, Calendar, MapPin, Briefcase, Home, Users, HeartHandshake, School, GraduationCap, FileText, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { getDesaName, getKecamatanName, getKabupatenName } from '@/lib/wilayah';
-import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '../../../../../components/ui/skeleton';
+import { Separator } from '../../../../../components/ui/separator';
+import { Badge } from '../../../../../components/ui/badge';
+import { cn } from '../../../../../lib/utils';
+import { getDesaName, getKecamatanName, getKabupatenName } from '../../../../../lib/wilayah';
+import { useToast } from '../../../../../hooks/use-toast';
 
 function InfoRow({ label, value, icon, className }: { label: string, value?: React.ReactNode, icon?: React.ElementType, className?: string }) {
     const Icon = icon;
@@ -85,7 +84,7 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
         }
     };
     fetchPegawai();
-  }, [id, toast]);
+  }, [id]);
 
   if (error) {
     return (
