@@ -1,7 +1,7 @@
 'use client';
 import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
-import type { AppSettings } from '@/lib/actions';
-import { getAppSettings, saveAppSettings } from '@/lib/actions';
+import type { AppSettings } from '../lib/actions';
+import { getAppSettings, saveAppSettings } from '../lib/actions';
 import { useToast } from './use-toast';
 
 interface AppSettingsContextType {

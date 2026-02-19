@@ -1,8 +1,7 @@
-
 'use client';
 import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
-import type { User } from '@/lib/auth';
-import { loginAction, updateUserAction } from '@/lib/auth';
+import type { User } from '../lib/auth';
+import { loginAction, updateUserAction } from '../lib/auth';
 
 interface AuthContextType {
   user: User | null;
