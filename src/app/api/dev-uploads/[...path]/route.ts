@@ -5,21 +5,25 @@ import path from 'path';
 import fs from 'fs';
 import mime from 'mime';
 
-// This route is for DEVELOPMENT ONLY to proxy requests from the Next.js dev server
-// to the file system, mimicking the production rewrite behavior.
-
 const UPLOADS_DIR = path.join(process.cwd(), '..', 'uploads');
 
 export async function GET(
   req: NextRequest,
   {params}: {params: {path: string[]}}
 ) {
-  // Prevent this route from being accessed in production
   if (process.env.NODE_ENV === 'production') {
     return new NextResponse('Not found', {status: 404});
   }
 
-  const filePath = path.join(UPLOADS_DIR, ...params.path);
+  const safePath = path.join(...params.path).replace(/\.\.\//g, '');
+  const filePath = path.join(UPLOADS_DIR, safePath);
+
+  const resolvedPath = path.resolve(filePath);
+  const resolvedUploadsDir = path.resolve(UPLOADS_DIR);
+
+  if (!resolvedPath.startsWith(resolvedUploadsDir)) {
+    return new NextResponse('Forbidden', {status: 403});
+  }
 
   try {
     await fs.promises.access(filePath, fs.constants.F_OK);

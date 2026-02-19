@@ -11,7 +11,17 @@ export async function GET(
   req: NextRequest,
   {params}: {params: {path: string[]}}
 ) {
-  const filePath = path.join(UPLOADS_DIR, ...params.path);
+  // Gabungkan path dan bersihkan dari upaya traversal
+  const safePath = path.join(...params.path).replace(/\.\.\//g, '');
+  const filePath = path.join(UPLOADS_DIR, safePath);
+
+  // Validasi akhir: Pastikan file yang diminta benar-benar ada di dalam UPLOADS_DIR
+  const resolvedPath = path.resolve(filePath);
+  const resolvedUploadsDir = path.resolve(UPLOADS_DIR);
+
+  if (!resolvedPath.startsWith(resolvedUploadsDir)) {
+    return new NextResponse('Forbidden', {status: 403});
+  }
 
   try {
     await fs.promises.access(filePath, fs.constants.F_OK);
