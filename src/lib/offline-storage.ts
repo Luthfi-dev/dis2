@@ -1,4 +1,3 @@
-
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -21,7 +20,6 @@ class OfflineStorage {
             const data = await fs.readFile(STORAGE_PATH, 'utf-8');
             this.cachedData = JSON.parse(data);
         } catch (e) {
-            // Revert to minimal structure if file doesn't exist
             this.cachedData = {
                 siswa: [],
                 pegawai: [],
@@ -32,10 +30,18 @@ class OfflineStorage {
                         name: 'Super Admin', 
                         role: 'superadmin', 
                         status: 'active', 
-                        password: '$2a$10$K6Z6Y6Z6Y6Z6Y6Z6Y6Z6YuP6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y' 
+                        password: '$2a$10$6K68kxFjrP0TdPta2q4Z.ub0liE1IB1dU5kCTR1Z77Bqj2AtSSrP6' 
+                    },
+                    { 
+                        id: '2', 
+                        email: 'admin@gmail.com', 
+                        name: 'Admin Sekolah', 
+                        role: 'admin', 
+                        status: 'active', 
+                        password: '$2a$10$6K68kxFjrP0TdPta2q4Z.ub0liE1IB1dU5kCTR1Z77Bqj2AtSSrP6' 
                     }
                 ],
-                app_settings: [{ id: 1, app_title: 'EduArchive Offline', app_description: 'Mode Offline Aktif' }]
+                app_settings: [{ id: 1, app_title: 'EduArchive Offline', app_description: 'Mode Offline Aktif - Audit Terverifikasi', app_logo_url: '' }]
             };
             await this.save();
         }
@@ -52,7 +58,11 @@ class OfflineStorage {
             const val = typeof p === 'string' ? `'${p.replace(/'/g, "''")}'` : (p === null ? 'NULL' : p);
             finalSql = finalSql.replace('?', String(val));
         });
-        await fs.appendFile(SQL_LOG_PATH, `${finalSql};\n`);
+        try {
+            await fs.appendFile(SQL_LOG_PATH, `${finalSql};\n`);
+        } catch (e) {
+            console.error("Failed to write SQL log:", e);
+        }
     }
 
     async executeQuery(sql: string, params: any[] = []): Promise<any> {
@@ -95,6 +105,9 @@ class OfflineStorage {
                 return this.cachedData!.users;
             }
             if (upperSql.includes('FROM APP_SETTINGS')) return this.cachedData!.app_settings;
+            
+            // Default query for Prov/Kab/Kec/Desa (Empty in offline mode dummy unless seeded)
+            return [];
         }
 
         if (upperSql.startsWith('INSERT INTO')) {
@@ -106,7 +119,6 @@ class OfflineStorage {
                 const newData: any = { id: newId };
                 columns.forEach((col, idx) => {
                     let val = params[idx];
-                    // Logic sinkron: jika params adalah JSON string, parse agar file .json tetap terstruktur
                     try { 
                         if(typeof val === 'string' && (val.startsWith('{') || val.startsWith('['))) {
                             val = JSON.parse(val);
@@ -123,14 +135,10 @@ class OfflineStorage {
 
         if (upperSql.startsWith('UPDATE')) {
             const table = upperSql.includes('SISWA') ? 'siswa' : (upperSql.includes('PEGAWAI') ? 'pegawai' : (upperSql.includes('USERS') ? 'users' : 'app_settings'));
-            
-            // Simpulkan update berdasarkan data terbaru (karena ini simulasi offline)
-            // Dalam implementasi nyata, kita harus mencari ID di params terakhir
             const id = params[params.length - 1];
             const targetIndex = (this.cachedData as any)[table].findIndex((item: any) => item.id.toString() === id?.toString());
             
             if (targetIndex !== -1) {
-                // Ekstrak kolom dari SQL UPDATE table SET col1 = ?, col2 = ? WHERE id = ?
                 const setMatch = sql.match(/SET (.*?) WHERE/i);
                 if (setMatch) {
                     const sets = setMatch[1].split(',').map(s => s.trim().split('=')[0].trim());
@@ -144,7 +152,6 @@ class OfflineStorage {
                         (this.cachedData as any)[table][targetIndex][col] = val;
                     });
                 } else if (table === 'app_settings') {
-                    // Penanganan khusus app_settings (biasanya id=1 fixed)
                     (this.cachedData as any)[table][0].app_title = params[0];
                     (this.cachedData as any)[table][0].app_description = params[1];
                     (this.cachedData as any)[table][0].app_logo_url = params[2];

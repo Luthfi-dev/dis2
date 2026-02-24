@@ -1,4 +1,5 @@
-// Pustaka internal, tidak boleh 'use server' karena mengekspor fungsi asinkron ke server-actions
+'use server';
+
 import getDB from './db';
 
 export type Wilayah = {
