@@ -3,15 +3,25 @@ import type {NextConfig} from 'next';
 import path from 'path';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Output standalone sangat optimal untuk hosting (Vercel, VPS, dll)
+  output: 'standalone',
+  
+  // Keamanan: Sembunyikan informasi server
+  poweredByHeader: false,
+  
+  // Optimasi: Kompresi aset otomatis
+  compress: true,
+
   typescript: {
-    // Diaktifkan kembali untuk keamanan: jangan abaikan error build
+    // Pastikan build gagal jika ada error type demi keamanan data
     ignoreBuildErrors: false,
   },
+  
   eslint: {
-    // Diaktifkan kembali untuk keamanan: jangan abaikan linting saat build
+    // Jalankan linting saat build untuk menjaga kualitas kode
     ignoreDuringBuilds: false,
   },
+
   images: {
     unoptimized: false,
     remotePatterns: [
@@ -23,14 +33,24 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
+  // Konfigurasi tambahan untuk mencegah 'garbage files' di root
+  // Next.js menggunakan .next/cache secara default. 
+  // Penulisan file acak biasanya berasal dari sistem native atau telemetry.
+  experimental: {
+    // Mengurangi penggunaan memori saat build
+    workerThreads: true,
+    cpus: 2,
+  },
+
   async rewrites() {
     return [
       {
         source: '/uploads/:path*',
         destination:
           process.env.NODE_ENV === 'development'
-            ? 'http://localhost:9002/api/dev-uploads/:path*' // A route to handle serving files in dev
-            : '/api/uploads/:path*', // A route to handle serving files in prod
+            ? 'http://localhost:9002/api/dev-uploads/:path*'
+            : '/api/uploads/:path*',
       },
     ];
   },
