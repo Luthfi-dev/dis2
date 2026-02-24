@@ -2,10 +2,14 @@
 import mysql from 'mysql2/promise';
 import { config } from 'dotenv';
 
-// Load environment variables from .env file
+// Load environment variables dari file .env jika ada
 config();
 
-// This configuration is now a factory function to ensure fresh config for each pool instance.
+/**
+ * Konfigurasi database MySQL Remote.
+ * Pastikan IP 195.88.211.130 telah mengizinkan koneksi (whitelisting) 
+ * dari lingkungan tempat aplikasi ini dijalankan.
+ */
 const dbConfig = {
     host: process.env.DB_HOST || '195.88.211.130',
     user: process.env.DB_USER || 'maudigic_gg',
@@ -15,12 +19,12 @@ const dbConfig = {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    // Enable keep-alive packets to prevent timeout issues
-    connectTimeout: 20000, 
+    connectTimeout: 30000, // Menambah timeout ke 30 detik
+    enableKeepAlive: true, // Menjaga koneksi tetap hidup
+    keepAliveInitialDelay: 10000,
 };
 
-// Create a single, shared pool instance
+// Singleton pool instance
 const pool = mysql.createPool(dbConfig);
 
-// Export the pool directly. It's designed to handle connection management.
 export default pool;

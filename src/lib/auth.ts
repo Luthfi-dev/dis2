@@ -1,7 +1,8 @@
+
 'use server';
 import 'server-only';
 import pool from './db';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs'; // Menggunakan bcryptjs agar stabil di semua lingkungan
 
 export type User = {
   id: string;
@@ -27,6 +28,7 @@ export async function loginAction(email: string, pass: string): Promise<{ succes
             return { success: false, error: 'Akun Anda telah diblokir.' };
         }
         
+        // Verifikasi password menggunakan bcryptjs
         const isPasswordValid = await bcrypt.compare(pass, user.password);
         if (!isPasswordValid) {
             return { success: false, error: 'Email atau password salah.' };
@@ -38,7 +40,7 @@ export async function loginAction(email: string, pass: string): Promise<{ succes
 
     } catch (error: any) {
         console.error('Login Error:', error);
-        return { success: false, error: 'Terjadi kesalahan pada server.' };
+        return { success: false, error: 'Terjadi kesalahan pada server saat mencoba login.' };
     } finally {
         db.release();
     }
@@ -54,7 +56,7 @@ export async function updateUserAction(updatedUserData: Partial<User> & { id: st
             const saltRounds = 10;
             dataToUpdate.password = await bcrypt.hash(dataToUpdate.password, saltRounds);
         } else {
-            delete dataToUpdate.password;
+            delete (dataToUpdate as any).password;
         }
 
         if (Object.keys(dataToUpdate).length === 0) {

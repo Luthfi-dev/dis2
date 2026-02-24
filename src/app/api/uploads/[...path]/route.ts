@@ -1,3 +1,4 @@
+
 import {NextRequest, NextResponse} from 'next/server';
 import path from 'path';
 import fs from 'fs';
@@ -9,13 +10,14 @@ export async function GET(
   req: NextRequest,
   {params}: {params: Promise<{path: string[]}>}
 ) {
+  // Next.js 15: params must be awaited
   const { path: pathSegments } = await params;
   const filePath = path.join(UPLOADS_DIR, ...pathSegments);
 
   try {
     await fs.promises.access(filePath, fs.constants.F_OK);
   } catch (e) {
-    return new NextResponse('Not found', {status: 404});
+    return new NextResponse('File not found', {status: 404});
   }
 
   const fileContents = await fs.promises.readFile(filePath);

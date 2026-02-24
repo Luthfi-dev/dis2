@@ -7,6 +7,7 @@ type Props = {
 };
 
 export default async function PreviewSiswaPage({ params }: Props) {
+  // Next.js 15: await params
   const { id } = await params;
   return <PreviewSiswaClient id={id} />;
 }

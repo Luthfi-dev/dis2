@@ -55,19 +55,12 @@ function Calendar({
         day_hidden: "invisible",
         ...classNames,
       }}
-      captionLayout="dropdown-buttons"
-      fromYear={new Date().getFullYear() - 100}
-      toYear={new Date().getFullYear()}
+      captionLayout="dropdown"
+      startMonth={new Date(new Date().getFullYear() - 100, 0)}
+      endMonth={new Date(new Date().getFullYear(), 11)}
       components={{
-        IconLeft: ({ className, ...props }) => (
-          <ChevronLeft className={cn("h-4 w-4", className)} {...props} />
-        ),
-        IconRight: ({ className, ...props }) => (
-          <ChevronRight className={cn("h-4 w-4", className)} {...props} />
-        ),
+        Chevron: ({ ...props }) => props.orientation === "left" ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />,
       }}
-      // Set defaultMonth to the selected date to open the calendar at the correct month
-      defaultMonth={props.selected as Date | undefined}
       {...props}
     />
   )
