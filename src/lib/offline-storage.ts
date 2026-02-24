@@ -1,10 +1,6 @@
-// File ini adalah pustaka internal, tidak boleh menggunakan 'use server' karena mengekspor instance objek.
+// File ini adalah pustaka internal, tidak boleh menggunakan 'use server'.
 import fs from 'fs/promises';
 import path from 'path';
-
-/**
- * Professional Offline Storage Engine
- */
 
 const STORAGE_PATH = path.join(process.cwd(), 'offline_db_data.json');
 const SQL_LOG_PATH = path.join(process.cwd(), 'local_audit_log.sql');
@@ -45,7 +41,7 @@ class OfflineStorage {
         let finalSql = sql;
         params.forEach(p => {
             const val = typeof p === 'string' ? `'${p.replace(/'/g, "''")}'` : (p === null ? 'NULL' : p);
-            finalSql = finalSql.replace('?', val);
+            finalSql = finalSql.replace('?', String(val));
         });
         await fs.appendFile(SQL_LOG_PATH, `${finalSql};\n`);
     }
@@ -59,7 +55,7 @@ class OfflineStorage {
                 let data = [...this.cachedData!.siswa];
                 if (params[0]) {
                     const search = params[0].replace(/%/g, '').toLowerCase();
-                    data = data.filter(s => s.siswa_namaLengkap.toLowerCase().includes(search) || s.siswa_nisn.includes(search));
+                    data = data.filter(s => String(s.siswa_namaLengkap).toLowerCase().includes(search) || String(s.siswa_nisn).includes(search));
                 }
                 return data;
             }
@@ -67,7 +63,7 @@ class OfflineStorage {
                 let data = [...this.cachedData!.pegawai];
                 if (params[0]) {
                     const search = params[0].replace(/%/g, '').toLowerCase();
-                    data = data.filter(p => p.pegawai_nama.toLowerCase().includes(search) || p.pegawai_nip.includes(search));
+                    data = data.filter(p => String(p.pegawai_nama).toLowerCase().includes(search) || String(p.pegawai_nip).includes(search));
                 }
                 return data;
             }
@@ -87,7 +83,11 @@ class OfflineStorage {
             if (columnsMatch) {
                 const columns = columnsMatch[1].split(',').map(c => c.trim());
                 const newData: any = { id: newId };
-                columns.forEach((col, idx) => newData[col] = params[idx]);
+                columns.forEach((col, idx) => {
+                    let val = params[idx];
+                    try { if(typeof val === 'string' && (val.startsWith('{') || val.startsWith('['))) val = JSON.parse(val); } catch(e) {}
+                    newData[col] = val;
+                });
                 (this.cachedData as any)[table].push(newData);
                 await this.save();
                 await this.logSql(sql, params);
@@ -96,13 +96,14 @@ class OfflineStorage {
         }
 
         if (upperSql.startsWith('UPDATE')) {
+            // Logic update offline sederhana (hanya simpan log SQL)
             await this.save();
             await this.logSql(sql, params);
             return { affectedRows: 1 };
         }
 
         if (upperSql.startsWith('DELETE')) {
-            const table = upperSql.includes('SISWA') ? 'siswa' : 'pegawai';
+            const table = upperSql.includes('SISWA') ? 'siswa' : (upperSql.includes('PEGAWAI') ? 'pegawai' : 'users');
             const id = params[0];
             (this.cachedData as any)[table] = (this.cachedData as any)[table].filter((item: any) => item.id.toString() !== id.toString());
             await this.save();

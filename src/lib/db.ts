@@ -41,7 +41,7 @@ export default async function getDB(): Promise<DBInterface> {
             beginTransaction: async () => {},
             commit: async () => {},
             rollback: async () => {},
-            release: () => {}
+            release: () => {} // No-op for offline
         };
     }
 

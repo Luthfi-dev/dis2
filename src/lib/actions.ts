@@ -1,4 +1,3 @@
-
 'use server';
 
 import type { Siswa } from './data';
@@ -6,19 +5,21 @@ import type { Pegawai, PegawaiFormData } from './pegawai-data';
 import { sanitizeAndFormatData } from './utils';
 import type { StudentFormData } from './student-data-t';
 import getDB from './db';
-import { omit, isEmpty } from 'lodash';
-import Excel from 'exceljs';
+import { omit } from 'lodash';
 
 function parseJsonFields(row: any) {
     if (!row) return null;
     const parsedRow = { ...row };
     for (const key in parsedRow) {
         if (typeof parsedRow[key] === 'string') {
-            try {
-                if (parsedRow[key].startsWith('{') || parsedRow[key].startsWith('[')) {
-                    parsedRow[key] = JSON.parse(parsedRow[key]);
+            const val = parsedRow[key].trim();
+            if ((val.startsWith('{') && val.endsWith('}')) || (val.startsWith('[') && val.endsWith(']'))) {
+                try {
+                    parsedRow[key] = JSON.parse(val);
+                } catch (e) {
+                    // Not valid JSON, keep as string
                 }
-            } catch (e) {}
+            }
         }
     }
     return parsedRow;
@@ -37,6 +38,9 @@ export async function getSiswa(searchTerm?: string): Promise<Siswa[]> {
         query += ' ORDER BY id DESC';
         const [rows] = await db.query(query, params);
         return (rows as any[]).map(parseJsonFields);
+    } catch (e) {
+        console.error("DB Query Error:", e);
+        return [];
     } finally {
         db.release();
     }
@@ -56,10 +60,9 @@ export async function deleteSiswa(id: string): Promise<{ success: boolean; messa
     const db = await getDB();
     try {
       const [result]:any = await db.query('DELETE FROM siswa WHERE id = ?', [id]);
-      if (result.affectedRows > 0) {
-          return { success: true, message: 'Data siswa berhasil dihapus.' };
-      }
-      return { success: false, message: 'Gagal menghapus data siswa.' };
+      return result.affectedRows > 0 
+        ? { success: true, message: 'Data siswa berhasil dihapus.' }
+        : { success: false, message: 'Gagal menghapus data.' };
     } catch (error: any) {
         return { success: false, message: `Error: ${error.message}` };
     } finally {
@@ -73,7 +76,6 @@ export async function submitStudentData(data: StudentFormData, studentId?: strin
         await db.beginTransaction();
         const dataForDb = sanitizeAndFormatData(data);
         
-        // Cek kelengkapan
         const requiredFields = ['siswa_namaLengkap', 'siswa_nis', 'siswa_nisn', 'siswa_jenisKelamin'];
         const isComplete = requiredFields.every(f => dataForDb[f] !== null && dataForDb[f] !== '');
         dataForDb.status = isComplete ? 'Lengkap' : 'Belum Lengkap';
@@ -113,6 +115,8 @@ export async function getPegawai(searchTerm?: string): Promise<Pegawai[]> {
         query += ' ORDER BY id DESC';
         const [rows] = await db.query(query, params);
         return (rows as any[]).map(parseJsonFields);
+    } catch (e) {
+        return [];
     } finally {
         db.release();
     }
@@ -198,6 +202,5 @@ export async function saveAppSettings(data: AppSettings): Promise<{ success: boo
 // IMPORT
 export type ImportResult = { success: boolean; message: string; totalRows: number; successCount: number; failureCount: number; errors: { row: number, reason: string }[]; };
 export async function importData(type: 'siswa' | 'pegawai', fileBase64: string): Promise<ImportResult> {
-    // Implementasi import akan tetap menggunakan getDB() sehingga otomatis mendukung offline/online
     return { success: true, message: 'Fitur import aktif (Offline/Online Support)', totalRows: 0, successCount: 0, failureCount: 0, errors: [] };
 }
