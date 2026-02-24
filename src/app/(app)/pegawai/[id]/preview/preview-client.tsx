@@ -1,3 +1,4 @@
+
 'use client';
 import { getPegawaiById } from '../../../../../lib/actions';
 import { Pegawai } from '../../../../../lib/pegawai-data';
@@ -203,12 +204,12 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
                         <FileRow label="Karpeg" document={pegawai.pegawai_karpeg} />
                         <FileRow label="Karis/Karsu" document={pegawai.pegawai_karisKarsu} />
                         <FileRow label="Buku Nikah" document={pegawai.pegawai_bukuNikah} />
-                        <FileRow label="Kartu Keluarga" document={pegawai.pegawai_kartuKeluarga} />
+                        <FileRow label="Kartu Keluarga" document={pegawai.pegawai_kartu Keluarga} />
                         <FileRow label="KTP" document={pegawai.pegawai_ktp} />
-                        <FileRow label="Akte Kelahiran" document={pegawai.pegawai_akteKelahiran} />
-                        <FileRow label="Kartu Taspen" document={pegawai.pegawai_kartuTaspen} />
+                        <FileRow label="Akte Kelahiran" document={pegawai.pegawai_akte Kelahiran} />
+                        <FileRow label="Kartu Taspen" document={pegawai.pegawai_kartu Taspen} />
                         <FileRow label="NPWP" document={pegawai.pegawai_npwp} />
-                        <FileRow label="Kartu BPJS" document={pegawai.pegawai_kartuBpjs} />
+                        <FileRow label="Kartu BPJS" document={pegawai.pegawai_kartu Bpjs} />
                         <FileRow label="Buku Rekening Gaji" document={pegawai.pegawai_bukuRekening} />
                     </div>
                 </section>
