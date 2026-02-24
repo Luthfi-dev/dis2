@@ -9,6 +9,10 @@ interface StorageSchema {
     pegawai: any[];
     users: any[];
     app_settings: any[];
+    provinsi: any[];
+    kabupaten: any[];
+    kecamatan: any[];
+    desa: any[];
 }
 
 class OfflineStorage {
@@ -41,7 +45,11 @@ class OfflineStorage {
                         password: '$2a$10$6K68kxFjrP0TdPta2q4Z.ub0liE1IB1dU5kCTR1Z77Bqj2AtSSrP6' 
                     }
                 ],
-                app_settings: [{ id: 1, app_title: 'EduArchive Offline', app_description: 'Mode Offline Aktif - Audit Terverifikasi', app_logo_url: '' }]
+                app_settings: [{ id: 1, app_title: 'EduArchive Offline', app_description: 'Mode Offline Aktif - Audit Terverifikasi', app_logo_url: '' }],
+                provinsi: [{ id: '11', name: 'ACEH' }, { id: '32', name: 'JAWA BARAT' }],
+                kabupaten: [{ id: '1111', name: 'KABUPATEN BIREUEN', province_id: '11' }, { id: '3273', name: 'KOTA BANDUNG', province_id: '32' }],
+                kecamatan: [{ id: '1111010', name: 'KOTA JUANG', regency_id: '1111' }, { id: '3273010', name: 'ANDIR', regency_id: '3273' }],
+                desa: [{ id: '1111010001', name: 'BANDAR BIREUEN', district_id: '1111010' }, { id: '3273010001', name: 'CAMPAKA', district_id: '3273010' }]
             };
             await this.save();
         }
@@ -77,7 +85,7 @@ class OfflineStorage {
                     data = data.filter(s => String(s.siswa_namaLengkap).toLowerCase().includes(search) || String(s.siswa_nisn).includes(search));
                 }
                 if (upperSql.includes('WHERE ID = ?')) {
-                    return data.filter(s => s.id.toString() === params[0].toString());
+                    return data.filter(s => s.id.toString() === params[0]?.toString());
                 }
                 return data;
             }
@@ -88,25 +96,45 @@ class OfflineStorage {
                     data = data.filter(p => String(p.pegawai_nama).toLowerCase().includes(search) || String(p.pegawai_nip).includes(search));
                 }
                 if (upperSql.includes('WHERE ID = ?')) {
-                    return data.filter(p => p.id.toString() === params[0].toString());
+                    return data.filter(p => p.id.toString() === params[0]?.toString());
                 }
                 return data;
             }
             if (upperSql.includes('FROM USERS')) {
                 if (upperSql.includes('WHERE EMAIL = ?')) {
-                    return this.cachedData!.users.filter(u => u.email.toLowerCase() === params[0].toLowerCase());
+                    return this.cachedData!.users.filter(u => u.email.toLowerCase() === params[0]?.toLowerCase());
                 }
                 if (upperSql.includes('WHERE ROLE !=')) {
                     return this.cachedData!.users.filter(u => u.role !== 'superadmin');
                 }
                 if (upperSql.includes('WHERE ID = ?')) {
-                    return this.cachedData!.users.filter(u => u.id.toString() === params[0].toString());
+                    return this.cachedData!.users.filter(u => u.id.toString() === params[0]?.toString());
                 }
                 return this.cachedData!.users;
             }
             if (upperSql.includes('FROM APP_SETTINGS')) return this.cachedData!.app_settings;
             
-            // Default query for Prov/Kab/Kec/Desa (Empty in offline mode dummy unless seeded)
+            // Handle Wilayah Selects
+            if (upperSql.includes('FROM PROVINSI')) {
+                if (upperSql.includes('WHERE ID = ?')) return this.cachedData!.provinsi.filter(p => p.id === params[0]);
+                return this.cachedData!.provinsi;
+            }
+            if (upperSql.includes('FROM KABUPATEN')) {
+                if (upperSql.includes('WHERE PROVINCE_ID = ?')) return this.cachedData!.kabupaten.filter(k => k.province_id === params[0]);
+                if (upperSql.includes('WHERE ID = ?')) return this.cachedData!.kabupaten.filter(k => k.id === params[0]);
+                return this.cachedData!.kabupaten;
+            }
+            if (upperSql.includes('FROM KECAMATAN')) {
+                if (upperSql.includes('WHERE REGENCY_ID = ?')) return this.cachedData!.kecamatan.filter(k => k.regency_id === params[0]);
+                if (upperSql.includes('WHERE ID = ?')) return this.cachedData!.kecamatan.filter(k => k.id === params[0]);
+                return this.cachedData!.kecamatan;
+            }
+            if (upperSql.includes('FROM DESA')) {
+                if (upperSql.includes('WHERE DISTRICT_ID = ?')) return this.cachedData!.desa.filter(d => d.district_id === params[0]);
+                if (upperSql.includes('WHERE ID = ?')) return this.cachedData!.desa.filter(d => d.id === params[0]);
+                return this.cachedData!.desa;
+            }
+
             return [];
         }
 

@@ -107,5 +107,21 @@
       "app_description": "Mode Offline Aktif - Audit Terverifikasi",
       "app_logo_url": ""
     }
+  ],
+  "provinsi": [
+    { "id": "11", "name": "ACEH" },
+    { "id": "32", "name": "JAWA BARAT" }
+  ],
+  "kabupaten": [
+    { "id": "1111", "name": "KABUPATEN BIREUEN", "province_id": "11" },
+    { "id": "3273", "name": "KOTA BANDUNG", "province_id": "32" }
+  ],
+  "kecamatan": [
+    { "id": "1111010", "name": "KOTA JUANG", "regency_id": "1111" },
+    { "id": "3273010", "name": "ANDIR", "regency_id": "3273" }
+  ],
+  "desa": [
+    { "id": "1111010001", "name": "BANDAR BIREUEN", "district_id": "1111010" },
+    { "id": "3273010001", "name": "CAMPAKA", "district_id": "3273010" }
   ]
 }
