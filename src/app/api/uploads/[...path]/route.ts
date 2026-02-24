@@ -4,8 +4,8 @@ import path from 'path';
 import fs from 'fs';
 import mime from 'mime';
 
-// Harus sama dengan direktori di API upload
-const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
+// Folder uploads berada di luar direktori proyek (../uploads)
+const UPLOADS_DIR = path.join(process.cwd(), '..', 'uploads');
 
 export async function GET(
   req: NextRequest,
@@ -13,7 +13,10 @@ export async function GET(
 ) {
   // Next.js 15: params must be awaited
   const { path: pathSegments } = await params;
-  const filePath = path.join(UPLOADS_DIR, ...pathSegments);
+  
+  // Sanitasi path untuk mencegah directory traversal
+  const safePath = pathSegments.filter(segment => !segment.includes('..'));
+  const filePath = path.join(UPLOADS_DIR, ...safePath);
 
   try {
     await fs.promises.access(filePath, fs.constants.F_OK);

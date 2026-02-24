@@ -4,8 +4,8 @@ import path from 'path';
 import fs from 'fs';
 import mime from 'mime';
 
-// Konsisten menggunakan folder lokal proyek
-const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
+// Menggunakan folder uploads di luar direktori proyek (../uploads)
+const UPLOADS_DIR = path.join(process.cwd(), '..', 'uploads');
 
 export async function GET(
   req: NextRequest,
@@ -17,7 +17,10 @@ export async function GET(
   }
 
   const { path: pathSegments } = await params;
-  const filePath = path.join(UPLOADS_DIR, ...pathSegments);
+  
+  // Sanitasi path
+  const safePath = pathSegments.filter(segment => !segment.includes('..'));
+  const filePath = path.join(UPLOADS_DIR, ...safePath);
 
   try {
     await fs.promises.access(filePath, fs.constants.F_OK);
