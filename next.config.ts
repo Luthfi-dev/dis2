@@ -1,7 +1,7 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  // output: 'standalone', // Dinonaktifkan sesuai permintaan user
   
   poweredByHeader: false,
   
@@ -33,6 +33,7 @@ const nextConfig: NextConfig = {
   },
 
   webpack: (config, { dev, isServer }) => {
+    // Mematikan cache filesystem untuk menghindari error ENOSPC (disk full) pada hosting terbatas
     if (!dev) {
       config.cache = false;
     }

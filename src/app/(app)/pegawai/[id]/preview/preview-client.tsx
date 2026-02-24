@@ -120,6 +120,7 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
         </div>
 
         <main className="p-6 sm:p-10">
+            {/* Header */}
             <header className="flex flex-col sm:flex-row items-center gap-6 mb-8 text-center sm:text-left">
                 {pegawai.pegawai_phaspoto?.fileURL ? (
                     <div className="relative w-32 h-40 border-4 border-primary/20 shadow-lg overflow-hidden rounded-lg">

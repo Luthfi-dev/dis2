@@ -1,4 +1,3 @@
-
 import { writeFile, mkdir } from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import { join, extname } from 'path';
@@ -33,7 +32,7 @@ export async function POST(request: NextRequest) {
     let fileBufferToSave = buffer;
 
     if (isImage) {
-        // Matikan cache disk sharp untuk mencegah file sampah acak di root/home
+        // MATIKAN CACHE DISK SHARP UNTUK MENCEGAH PENULISAN FILE SAMPAH DI ROOT/HOME
         sharp.cache(false); 
         
         fileBufferToSave = await sharp(buffer)
