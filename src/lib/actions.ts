@@ -1,11 +1,9 @@
-
 'use server';
 
 import type { Siswa } from './data';
-import type { Pegawai } from './pegawai-data';
+import type { Pegawai, PegawaiFormData } from './pegawai-data';
 import { sanitizeAndFormatData } from './utils';
-import type { PegawaiFormData } from '@/lib/pegawai-data';
-import type { StudentFormData } from '@/lib/student-data-t';
+import type { StudentFormData } from './student-data-t';
 import pool from './db';
 import { omit, isEmpty } from 'lodash';
 import Excel from 'exceljs';
@@ -81,7 +79,6 @@ export async function deleteSiswa(id: string): Promise<{ success: boolean; messa
 export async function submitStudentData(data: StudentFormData, studentId?: string) {
     const db = await pool.getConnection();
     try {
-        // Cek duplikat hanya jika NIS atau NISN diisi
         if (data.siswa_nis || data.siswa_nisn) {
             const conditions = [];
             const params = [];
@@ -470,4 +467,3 @@ const pegawaiHeaders = [
     { header: 'NRG', key: 'pegawai_nrg' },
     { header: 'Bidang Studi', key: 'pegawai_bidangStudi' },
 ];
-

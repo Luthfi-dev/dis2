@@ -1,22 +1,20 @@
-
 'use client';
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useAuth } from '@/hooks/use-auth';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '../../../../hooks/use-auth';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '../../../../components/ui/card';
+import { Button } from '../../../../components/ui/button';
+import { Input } from '../../../../components/ui/input';
+import { Label } from '../../../../components/ui/label';
+import { useToast } from '../../../../hooks/use-toast';
 import { Loader2, UploadCloud, Image as ImageIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useTransition } from 'react';
-import { Textarea } from '@/components/ui/textarea';
+import { Textarea } from '../../../../components/ui/textarea';
 import Image from 'next/image';
-import { useAppSettings } from '@/hooks/use-app-settings';
-import type { AppSettings } from '@/lib/actions';
+import { useAppSettings } from '../../../../hooks/use-app-settings';
 
 const settingsSchema = z.object({
     app_title: z.string().min(1, 'Judul aplikasi wajib diisi.'),
@@ -48,7 +46,7 @@ export default function AdminSettingsPage() {
     const [isPending, startTransition] = useTransition();
     const { toast } = useToast();
 
-    const { register, handleSubmit, formState: { errors }, reset, setValue, watch, formState: {isSubmitting} } = useForm<SettingsFormData>({
+    const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<SettingsFormData>({
         resolver: zodResolver(settingsSchema),
     });
     
