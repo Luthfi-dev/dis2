@@ -39,6 +39,14 @@ const nextConfig: NextConfig = {
     cpus: 2,
   },
 
+  // Mengatasi ENOSPC: Menonaktifkan cache Webpack di disk saat build produksi
+  webpack: (config, { dev, isServer }) => {
+    if (!dev) {
+      config.cache = false;
+    }
+    return config;
+  },
+
   async rewrites() {
     return [
       {
