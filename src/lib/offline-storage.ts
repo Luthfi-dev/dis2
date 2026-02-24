@@ -17,13 +17,37 @@ class OfflineStorage {
 
     private async init() {
         if (this.cachedData) return;
+        
+        // Password hash untuk '123456' menggunakan bcrypt standar
+        const defaultPasswordHash = '$2a$10$K6Z6Y6Z6Y6Z6Y6Z6Y6Z6YuP6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y';
+        
         try {
             const data = await fs.readFile(STORAGE_PATH, 'utf-8');
             this.cachedData = JSON.parse(data);
-        } catch (e) {
-            // Password hash untuk '123456' menggunakan bcrypt standar
-            const defaultPasswordHash = '$2a$10$K6Z6Y6Z6Y6Z6Y6Z6Y6Z6YuP6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y';
             
+            // Pastikan tabel users ada jika file sudah ada namun versi lama
+            if (!this.cachedData!.users) {
+                this.cachedData!.users = [
+                    { 
+                        id: '1', 
+                        email: 'superadmin@gmail.com', 
+                        name: 'Super Admin', 
+                        role: 'superadmin', 
+                        status: 'active', 
+                        password: defaultPasswordHash 
+                    },
+                    { 
+                        id: '2', 
+                        email: 'admin@gmail.com', 
+                        name: 'Admin Sekolah', 
+                        role: 'admin', 
+                        status: 'active', 
+                        password: defaultPasswordHash 
+                    }
+                ];
+                await this.save();
+            }
+        } catch (e) {
             this.cachedData = {
                 siswa: this.generateDummySiswa(),
                 pegawai: this.generateDummyPegawai(),
