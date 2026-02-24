@@ -5,10 +5,12 @@ import path from 'path';
 const nextConfig: NextConfig = {
   /* config options here */
   typescript: {
-    ignoreBuildErrors: true,
+    // Diaktifkan kembali untuk keamanan: jangan abaikan error build
+    ignoreBuildErrors: false,
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    // Diaktifkan kembali untuk keamanan: jangan abaikan linting saat build
+    ignoreDuringBuilds: false,
   },
   images: {
     unoptimized: false,
