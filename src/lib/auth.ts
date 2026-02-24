@@ -1,6 +1,7 @@
+
 'use server';
 import 'server-only';
-import pool from './db';
+import getDB from './db';
 import bcrypt from 'bcryptjs';
 
 export type User = {
@@ -14,77 +15,51 @@ export type User = {
 };
 
 export async function loginAction(email: string, pass: string): Promise<{ success: boolean; user?: User; error?: string }> {
-    const db = await pool.getConnection();
+    const db = await getDB();
     try {
         const [rows]: any[] = await db.query('SELECT * FROM users WHERE email = ?', [email.toLowerCase()]);
         const user = rows[0];
 
-        if (!user) {
-            return { success: false, error: 'Email atau password salah.' };
-        }
-
-        if (user.status === 'blocked') {
-            return { success: false, error: 'Akun Anda telah diblokir.' };
-        }
+        if (!user) return { success: false, error: 'Email atau password salah.' };
+        if (user.status === 'blocked') return { success: false, error: 'Akun diblokir.' };
         
         const isPasswordValid = await bcrypt.compare(pass, user.password);
-        if (!isPasswordValid) {
-            return { success: false, error: 'Email atau password salah.' };
-        }
+        if (!isPasswordValid) return { success: false, error: 'Email atau password salah.' };
         
         const sessionUser = { ...user };
         delete sessionUser.password;
         return { success: true, user: sessionUser };
-
     } catch (error: any) {
-        console.error('Login Error:', error);
-        return { success: false, error: 'Terjadi kesalahan pada server.' };
+        return { success: false, error: 'Kesalahan sistem.' };
     } finally {
         db.release();
     }
 }
 
 export async function updateUserAction(updatedUserData: Partial<User> & { id: string }): Promise<{ success: boolean, user?: User, error?: string }> {
-    const db = await pool.getConnection();
+    const db = await getDB();
     try {
-        await db.beginTransaction();
-        const { id, ...dataToUpdate } = updatedUserData;
-
-        if (dataToUpdate.password && dataToUpdate.password.length > 0) {
-            const saltRounds = 10;
-            dataToUpdate.password = await bcrypt.hash(dataToUpdate.password, saltRounds);
-        } else {
-            delete (dataToUpdate as any).password;
-        }
-
-        if (Object.keys(dataToUpdate).length === 0) {
-             const [currentRows]: any[] = await db.query('SELECT id, email, name, role, status, avatar FROM users WHERE id = ?', [id]);
-             await db.commit();
-             return { success: true, user: currentRows[0] };
-        }
-
-        const fields = Object.keys(dataToUpdate).map(key => `${key} = ?`).join(', ');
-        const values = [...Object.values(dataToUpdate), id];
-
-        await db.query(`UPDATE users SET ${fields} WHERE id = ?`, values);
+        const { id, password, ...rest } = updatedUserData;
+        let query = 'UPDATE users SET name = ?, email = ?, avatar = ?';
+        const params = [rest.name, rest.email, rest.avatar];
         
+        if (password) {
+            query += ', password = ?';
+            params.push(await bcrypt.hash(password, 10));
+        }
+        query += ' WHERE id = ?';
+        params.push(id);
+
+        await db.query(query, params);
         const [rows]: any[] = await db.query('SELECT id, email, name, role, status, avatar FROM users WHERE id = ?', [id]);
-        const updatedUser = rows[0];
-        
-        await db.commit();
-        return { success: true, user: updatedUser };
-
-    } catch (error: any) {
-        await db.rollback();
-        console.error('Update User Error:', error);
-        return { success: false, error: 'Gagal memperbarui pengguna.' };
+        return { success: true, user: rows[0] };
     } finally {
         db.release();
     }
 }
 
 export async function getUsers(): Promise<User[]> {
-    const db = await pool.getConnection();
+    const db = await getDB();
     try {
         const [rows] = await db.query("SELECT id, email, name, role, status, avatar FROM users WHERE role != 'superadmin'");
         return rows as User[];
@@ -94,52 +69,28 @@ export async function getUsers(): Promise<User[]> {
 }
 
 export async function saveUser(user: Partial<User> & { id?: string }): Promise<{ success: boolean; message: string }> {
-    const db = await pool.getConnection();
+    const db = await getDB();
     try {
-        await db.beginTransaction();
         const isUpdating = !!user.id;
-        
-        if (user.password && user.password.length > 0) {
-            const saltRounds = 10;
-            user.password = await bcrypt.hash(user.password, saltRounds); 
-        } else {
-            delete user.password;
-        }
-
         if (isUpdating) {
-            const { id, ...updateData } = user;
-            if (Object.keys(updateData).length === 0) {
-                 await db.commit();
-                 return { success: true, message: 'Tidak ada perubahan.' };
-            }
-            const fields = Object.keys(updateData).map(key => `${key} = ?`).join(', ');
-            const values = Object.values(updateData);
-            await db.query(`UPDATE users SET ${fields} WHERE id = ?`, [...values, id]);
-            await db.commit();
-            return { success: true, message: 'Pengguna diperbarui.' };
+            const { id, password, ...rest } = user;
+            await db.query('UPDATE users SET name = ?, email = ?, role = ?, status = ? WHERE id = ?', [rest.name, rest.email, rest.role, rest.status, id]);
+            return { success: true, message: 'Berhasil.' };
         } else {
-            const fields = Object.keys(user).filter(k => k !== 'id');
-            const placeholders = fields.map(() => '?').join(', ');
-            const values = fields.map(k => (user as any)[k]);
-            await db.query(`INSERT INTO users (${fields.join(', ')}) VALUES (${placeholders})`, values);
-            await db.commit();
-            return { success: true, message: 'Pengguna ditambahkan.' };
+            const hash = await bcrypt.hash(user.password || '123456', 10);
+            await db.query('INSERT INTO users (name, email, role, status, password) VALUES (?, ?, ?, ?, ?)', [user.name, user.email, user.role, user.status, hash]);
+            return { success: true, message: 'Berhasil.' };
         }
-    } catch (error: any) {
-        await db.rollback();
-        return { success: false, message: `Error: ${error.message}` };
     } finally {
         db.release();
     }
 }
 
 export async function deleteUser(id: string): Promise<{ success: boolean; message: string }> {
-    const db = await pool.getConnection();
+    const db = await getDB();
     try {
-        const [result]: any = await db.query('DELETE FROM users WHERE id = ?', [id]);
-        return result.affectedRows > 0 
-            ? { success: true, message: 'Pengguna dihapus.' }
-            : { success: false, message: 'Gagal.' };
+        await db.query('DELETE FROM users WHERE id = ?', [id]);
+        return { success: true, message: 'Dihapus.' };
     } finally {
         db.release();
     }
@@ -149,7 +100,5 @@ export async function generateHash(password: string): Promise<{ success: boolean
     try {
         const hash = await bcrypt.hash(password, 10);
         return { success: true, hash };
-    } catch(error: any) {
-        return { success: false, error: error.message };
-    }
+    } catch(e: any) { return { success: false, error: e.message }; }
 }

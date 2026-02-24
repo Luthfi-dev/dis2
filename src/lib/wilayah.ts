@@ -1,6 +1,5 @@
-
 'use server'
-import pool from './db';
+import getDB from './db';
 
 export type Wilayah = {
     id: string;
@@ -15,7 +14,7 @@ export type Desa = Wilayah & { district_id: string };
 
 // --- Getter functions from DB ---
 export async function getProvinces(): Promise<Provinsi[]> {
-    const db = await pool.getConnection();
+    const db = await getDB();
     try {
         const [rows] = await db.query('SELECT id, name FROM provinsi ORDER BY name');
         return rows as Provinsi[];
@@ -26,7 +25,7 @@ export async function getProvinces(): Promise<Provinsi[]> {
 
 export async function getKabupatens(provinceId?: string): Promise<Kabupaten[]> {
     if (!provinceId) return [];
-    const db = await pool.getConnection();
+    const db = await getDB();
     try {
         const [rows] = await db.query('SELECT id, name, province_id FROM kabupaten WHERE province_id = ? ORDER BY name', [provinceId]);
         return rows as Kabupaten[];
@@ -37,7 +36,7 @@ export async function getKabupatens(provinceId?: string): Promise<Kabupaten[]> {
 
 export async function getKecamatans(regencyId?: string): Promise<Kecamatan[]> {
     if (!regencyId) return [];
-    const db = await pool.getConnection();
+    const db = await getDB();
     try {
         const [rows] = await db.query('SELECT id, name, regency_id FROM kecamatan WHERE regency_id = ? ORDER BY name', [regencyId]);
         return rows as Kecamatan[];
@@ -48,7 +47,7 @@ export async function getKecamatans(regencyId?: string): Promise<Kecamatan[]> {
 
 export async function getDesas(districtId?: string): Promise<Desa[]> {
     if (!districtId) return [];
-    const db = await pool.getConnection();
+    const db = await getDB();
     try {
         const [rows] = await db.query('SELECT id, name, district_id FROM desa WHERE district_id = ? ORDER BY name', [districtId]);
         return rows as Desa[];
@@ -61,7 +60,7 @@ export async function getDesas(districtId?: string): Promise<Desa[]> {
 // --- Helper functions to get names by ID ---
 export async function getProvinceName(id?: string): Promise<string> {
     if (!id) return '';
-    const db = await pool.getConnection();
+    const db = await getDB();
     try {
         const [rows]: any[] = await db.query('SELECT name FROM provinsi WHERE id = ?', [id]);
         return rows[0]?.name || id;
@@ -72,7 +71,7 @@ export async function getProvinceName(id?: string): Promise<string> {
 
 export async function getKabupatenName(id?: string): Promise<string> {
     if (!id) return '';
-    const db = await pool.getConnection();
+    const db = await getDB();
     try {
         const [rows]: any[] = await db.query('SELECT name FROM kabupaten WHERE id = ?', [id]);
         return rows[0]?.name || id;
@@ -83,7 +82,7 @@ export async function getKabupatenName(id?: string): Promise<string> {
 
 export async function getKecamatanName(id?: string): Promise<string> {
     if (!id) return '';
-    const db = await pool.getConnection();
+    const db = await getDB();
     try {
         const [rows]: any[] = await db.query('SELECT name FROM kecamatan WHERE id = ?', [id]);
         return rows[0]?.name || id;
@@ -94,7 +93,7 @@ export async function getKecamatanName(id?: string): Promise<string> {
 
 export async function getDesaName(id?: string): Promise<string> {
     if (!id) return '';
-    const db = await pool.getConnection();
+    const db = await getDB();
     try {
         const [rows]: any[] = await db.query('SELECT name FROM desa WHERE id = ?', [id]);
         return rows[0]?.name || id;

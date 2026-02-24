@@ -7,7 +7,7 @@ type Props = {
 };
 
 export default async function LihatPegawaiPage({ params }: Props) {
-  // Next.js 15: await params to get the dynamic ID
+  // Next.js 15: params must be awaited
   const { id } = await params;
   return <LihatPegawaiClient id={id} />;
 }

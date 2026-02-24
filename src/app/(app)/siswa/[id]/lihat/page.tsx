@@ -7,7 +7,7 @@ type Props = {
 }
 
 export default async function LihatSiswaPage({ params }: Props) {
-  // Next.js 15: await params
+  // Next.js 15: params must be awaited
   const { id } = await params;
   return <LihatSiswaClient id={id} />;
 }
