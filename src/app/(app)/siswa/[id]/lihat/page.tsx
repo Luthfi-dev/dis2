@@ -1,9 +1,12 @@
 
 'use server';
-
 import { LihatSiswaClient } from './lihat-siswa-client';
 
-export default async function LihatSiswaPage({ params }: { params: { id: string } }) {
-  const id = params.id;
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function LihatSiswaPage({ params }: Props) {
+  const { id } = await params;
   return <LihatSiswaClient id={id} />;
 }

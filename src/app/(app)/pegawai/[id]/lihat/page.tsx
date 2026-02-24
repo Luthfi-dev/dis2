@@ -1,9 +1,12 @@
 
 'use server';
-
 import { LihatPegawaiClient } from './lihat-pegawai-client';
 
-export default async function LihatPegawaiPage({ params }: { params: { id: string } }) {
-  const id = params.id;
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function LihatPegawaiPage({ params }: Props) {
+  const { id } = await params;
   return <LihatPegawaiClient id={id} />;
 }

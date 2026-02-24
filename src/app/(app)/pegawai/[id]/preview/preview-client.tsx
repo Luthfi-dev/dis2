@@ -1,18 +1,18 @@
 
 'use client';
-import { getPegawaiById } from '@/lib/actions';
-import { Pegawai } from '@/lib/pegawai-data';
+import { getPegawaiById } from '../../../../../lib/actions';
+import { Pegawai } from '../../../../../lib/pegawai-data';
 import { notFound } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { Button } from '../../../../../components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, Printer, User, Calendar, MapPin, Briefcase, Home, Users, HeartHandshake, School, GraduationCap, FileText, CheckCircle2, XCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { getDesaName, getKecamatanName, getKabupatenName } from '@/lib/wilayah';
+import { Skeleton } from '../../../../../components/ui/skeleton';
+import { Separator } from '../../../../../components/ui/separator';
+import { Badge } from '../../../../../components/ui/badge';
+import { cn } from '../../../../../lib/utils';
+import { getDesaName, getKecamatanName, getKabupatenName } from '../../../../../lib/wilayah';
 
 function InfoRow({ label, value, icon, className }: { label: string, value?: React.ReactNode, icon?: React.ElementType, className?: string }) {
     const Icon = icon;
@@ -42,7 +42,7 @@ function FileRow({ label, document, isMulti = false }: { label: string, document
     if (isMulti && Array.isArray(document) && document.length > 0) {
         value = (
             <ul className="list-disc list-inside space-y-1">
-                {document.map((doc, index) => (
+                {document.map((doc: any, index: number) => (
                     <li key={index} className="truncate">{doc.fileName}</li>
                 ))}
             </ul>
@@ -65,9 +65,11 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
         const result = await getPegawaiById(id);
         if(result) {
             setPegawai(result);
-            const kabName = await getKabupatenName(result.pegawai_alamatKabupaten);
-            const kecName = await getKecamatanName(result.pegawai_alamatKecamatan);
-            const desaName = await getDesaName(result.pegawai_alamatDesa);
+            const [kabName, kecName, desaName] = await Promise.all([
+                getKabupatenName(result.pegawai_alamatKabupaten),
+                getKecamatanName(result.pegawai_alamatKecamatan),
+                getDesaName(result.pegawai_alamatDesa)
+            ]);
             setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
         }
         setLoading(false);

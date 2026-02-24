@@ -2,9 +2,11 @@
 'use server';
 import { EditPegawaiForm } from './edit-form';
 
-export default async function EditPegawaiPage({ params }: { params: { id: string } }) {
-  const id = params.id;
-  
-  // The client component will handle data fetching.
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function EditPegawaiPage({ params }: Props) {
+  const { id } = await params;
   return <EditPegawaiForm pegawaiId={id} />;
 }

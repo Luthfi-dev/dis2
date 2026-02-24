@@ -2,7 +2,11 @@
 'use server';
 import { PreviewPegawaiClient } from './preview-client';
 
-export default async function PreviewPegawaiPage({ params }: { params: { id: string } }) {
-  const id = params.id;
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function PreviewPegawaiPage({ params }: Props) {
+  const { id } = await params;
   return <PreviewPegawaiClient id={id} />;
 }

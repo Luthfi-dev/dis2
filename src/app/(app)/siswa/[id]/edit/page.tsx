@@ -2,9 +2,11 @@
 'use server';
 import { EditStudentForm } from './edit-form';
 
-export default async function EditSiswaPage({ params }: { params: { id: string } }) {
-  const id = params.id;
-  
-  // The client component will handle data fetching.
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function EditSiswaPage({ params }: Props) {
+  const { id } = await params;
   return <EditStudentForm studentId={id} />;
 }

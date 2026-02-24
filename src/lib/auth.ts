@@ -55,7 +55,7 @@ export async function updateUserAction(updatedUserData: Partial<User> & { id: st
             const saltRounds = 10;
             dataToUpdate.password = await bcrypt.hash(dataToUpdate.password, saltRounds);
         } else {
-            delete dataToUpdate.password; // Don't update password if it's empty
+            delete dataToUpdate.password;
         }
 
         if (Object.keys(dataToUpdate).length === 0) {
@@ -123,12 +123,9 @@ export async function saveUser(user: Partial<User> & { id?: string }): Promise<{
                 await db.rollback();
                 return { success: false, message: 'Password wajib diisi untuk pengguna baru.' };
             }
-            if(user.id) { // This handles if an ID was passed for a new user, which shouldn't happen with auto-increment
-                delete user.id;
-            }
-            const fields = Object.keys(user);
+            const fields = Object.keys(user).filter(k => k !== 'id');
             const placeholders = fields.map(() => '?').join(', ');
-            const values = Object.values(user);
+            const values = fields.map(k => (user as any)[k]);
             await db.query(`INSERT INTO users (${fields.join(', ')}) VALUES (${placeholders})`, values);
             await db.commit();
             return { success: true, message: 'Pengguna berhasil ditambahkan.' };

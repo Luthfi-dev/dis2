@@ -1,18 +1,18 @@
 
 'use client';
-import { getPegawaiById } from '@/lib/actions';
-import { Pegawai } from '@/lib/pegawai-data';
+import { getPegawaiById } from '../../../../../lib/actions';
+import { Pegawai } from '../../../../../lib/pegawai-data';
 import { notFound } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../../../components/ui/card';
+import { Button } from '../../../../../components/ui/button';
 import Link from 'next/link';
 import { FilePen, ArrowLeft, Building, User, Calendar, Mail, Phone, MapPin, Droplet, Stethoscope, BookOpen, File as FileIcon, Image as ImageIcon, Users, Languages, GraduationCap, School, HeartHandshake, Home, Briefcase, FileText } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '../../../../../components/ui/badge';
 import { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '../../../../../components/ui/skeleton';
 import Image from 'next/image';
-import { Separator } from '@/components/ui/separator';
-import { getDesaName, getKecamatanName, getKabupatenName } from '@/lib/wilayah';
+import { Separator } from '../../../../../components/ui/separator';
+import { getDesaName, getKecamatanName, getKabupatenName } from '../../../../../lib/wilayah';
 
 
 function DetailItem({ label, value, icon }: { label: string; value: React.ReactNode; icon: React.ElementType }) {
@@ -87,10 +87,11 @@ export function LihatPegawaiClient({ id }: { id: string }) {
             const result = await getPegawaiById(id);
             if(result) {
                 setPegawai(result);
-                // Fetch wilayah names
-                const kabName = await getKabupatenName(result.pegawai_alamatKabupaten);
-                const kecName = await getKecamatanName(result.pegawai_alamatKecamatan);
-                const desaName = await getDesaName(result.pegawai_alamatDesa);
+                const [kabName, kecName, desaName] = await Promise.all([
+                    getKabupatenName(result.pegawai_alamatKabupaten),
+                    getKecamatanName(result.pegawai_alamatKecamatan),
+                    getDesaName(result.pegawai_alamatDesa)
+                ]);
                 setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
             }
             setLoading(false);
