@@ -1,9 +1,8 @@
-
 'use client';
-import { AppHeader } from '@/components/app-header';
-import { AppSidebar } from '@/components/app-sidebar';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
-import { useAuth } from '@/hooks/use-auth';
+import { AppHeader } from '../../components/app-header';
+import { AppSidebar } from '../../components/app-sidebar';
+import { SidebarProvider, SidebarInset } from '../../components/ui/sidebar';
+import { useAuth } from '../../hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';

@@ -1,14 +1,13 @@
-
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Button } from '../../../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../../../components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from '../../../components/ui/dropdown-menu';
 import { MoreHorizontal, PlusCircle, Upload, Download, FilePen, Eye, FileSearch, Trash2, Search, Loader2, ChevronLeft, ChevronRight, AlertCircle, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { Siswa } from '@/lib/data';
-import { Badge } from '@/components/ui/badge';
+import { Siswa } from '../../../lib/data';
+import { Badge } from '../../../components/ui/badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +17,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "../../../components/ui/alert-dialog"
 import {
   Dialog,
   DialogContent,
@@ -28,12 +27,12 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose,
-} from "@/components/ui/dialog"
+} from "../../../components/ui/dialog"
 import React, { useState, useEffect, useMemo, useTransition, useCallback } from 'react';
-import { Input } from '@/components/ui/input';
-import { getSiswa, deleteSiswa, importData, ImportResult } from '@/lib/actions';
-import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
+import { Input } from '../../../components/ui/input';
+import { getSiswa, deleteSiswa, importData, ImportResult } from '../../../lib/actions';
+import { useToast } from '../../../hooks/use-toast';
+import { cn } from '../../../lib/utils';
 import { debounce } from 'lodash';
 
 function ActionMenu({ student, onDelete }: { student: Siswa, onDelete: (id: string) => void }) {
@@ -174,11 +173,15 @@ function ImportDialog({ onImportComplete }: { onImportComplete: (result: ImportR
       return;
     }
     startImportTransition(async () => {
-        const fileBase64 = await toBase64(file);
-        const result = await importData('siswa', fileBase64);
-        onImportComplete(result);
-        setFile(null);
-        setIsOpen(false);
+        try {
+            const fileBase64 = await toBase64(file);
+            const result = await importData('siswa', fileBase64);
+            onImportComplete(result);
+            setFile(null);
+            setIsOpen(false);
+        } catch (e) {
+            toast({ title: "Gagal", description: "Terjadi kesalahan saat mengimpor.", variant: "destructive" });
+        }
     });
   };
 
@@ -225,22 +228,22 @@ export default function SiswaPage() {
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [isResultOpen, setIsResultOpen] = useState(false);
 
-  const debouncedFetchStudents = useCallback(
-    debounce((search: string) => {
-      setLoading(true);
-      getSiswa(search).then(data => {
-        setStudents(data);
-        setCurrentPage(1); // Reset to first page on new search
-        setLoading(false);
-      });
-    }, 500), // 500ms debounce delay
-    []
+  const fetchStudents = useCallback(async (search: string) => {
+    setLoading(true);
+    const data = await getSiswa(search);
+    setStudents(data);
+    setCurrentPage(1);
+    setLoading(false);
+  }, []);
+
+  const debouncedFetchStudents = useMemo(
+    () => debounce((search: string) => fetchStudents(search), 500),
+    [fetchStudents]
   );
 
   useEffect(() => {
     debouncedFetchStudents(searchTerm);
     return () => {
-      // Cancel the debounce on useEffect cleanup
       debouncedFetchStudents.cancel();
     };
   }, [searchTerm, debouncedFetchStudents]);
@@ -248,7 +251,7 @@ export default function SiswaPage() {
   const handleImportComplete = (result: ImportResult) => {
     setImportResult(result);
     setIsResultOpen(true);
-    debouncedFetchStudents(searchTerm); // Refresh list after import
+    fetchStudents(searchTerm);
   }
 
   const handleDeleteStudent = (id: string) => {
@@ -263,7 +266,6 @@ export default function SiswaPage() {
     });
   };
 
-  // Pagination logic
   const totalPages = Math.ceil(students.length / ITEMS_PER_PAGE);
   const paginatedData = useMemo(() => {
       const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -279,37 +281,15 @@ export default function SiswaPage() {
 
   const generatePagination = () => {
     if (totalPages <= 1) return [];
-
     const pages = [];
-    const visiblePages = 2; // number of pages to show around current page
-
-    // Always show first page
+    const visiblePages = 2;
     pages.push(1);
-
-    // Ellipsis after first page
-    if (currentPage > visiblePages + 2) {
-        pages.push('...');
-    }
-
-    // Pages around current page
+    if (currentPage > visiblePages + 2) pages.push('...');
     let startPage = Math.max(2, currentPage - visiblePages);
     let endPage = Math.min(totalPages - 1, currentPage + visiblePages);
-
-    for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-    }
-    
-    // Ellipsis before last page
-    if (currentPage < totalPages - visiblePages - 1) {
-        pages.push('...');
-    }
-
-    // Always show last page
-    if (totalPages > 1) {
-       pages.push(totalPages);
-    }
-    
-    // Remove duplicates that might occur if totalPages is small
+    for (let i = startPage; i <= endPage; i++) pages.push(i);
+    if (currentPage < totalPages - visiblePages - 1) pages.push('...');
+    if (totalPages > 1) pages.push(totalPages);
     return [...new Set(pages)];
   }
 
@@ -415,7 +395,6 @@ export default function SiswaPage() {
                 <nav className="flex items-center gap-1">
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handlePageChange(1)} disabled={currentPage === 1}><ChevronsLeft className="h-4 w-4" /></Button>
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}><ChevronLeft className="h-4 w-4" /></Button>
-                    
                     {paginationItems.map((page, index) => (
                         <React.Fragment key={index}>
                             {typeof page === 'number' ? (
@@ -432,7 +411,6 @@ export default function SiswaPage() {
                             )}
                         </React.Fragment>
                     ))}
-
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}><ChevronRight className="h-4 w-4" /></Button>
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages}><ChevronsRight className="h-4 w-4" /></Button>
                 </nav>
@@ -442,4 +420,3 @@ export default function SiswaPage() {
     </div>
   );
 }
-

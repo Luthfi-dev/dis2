@@ -1,18 +1,17 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
 import { Users, Briefcase, ArrowRight, History, BookCopy } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { useAuth } from '@/hooks/use-auth';
-import { getSiswa, getPegawai } from '@/lib/actions';
-import { getActivities, Activity } from '@/lib/activity-log';
+import { useAuth } from '../../../hooks/use-auth';
+import { getSiswa, getPegawai } from '../../../lib/actions';
+import { getActivities, Activity } from '../../../lib/activity-log';
 import { formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { useAppSettings } from '@/hooks/use-app-settings';
+import { useAppSettings } from '../../../hooks/use-app-settings';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -24,8 +23,10 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchData() {
         try {
-            const siswaData = await getSiswa();
-            const pegawaiData = await getPegawai();
+            const [siswaData, pegawaiData] = await Promise.all([
+                getSiswa(),
+                getPegawai()
+            ]);
             
             setSiswaCount(siswaData.length);
             setPegawaiCount(pegawaiData.length);
@@ -49,7 +50,6 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">Berikut adalah ringkasan dari aplikasi {settings?.app_title || "EduArchive"} Anda.</p>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
         <Card className="hover:border-primary/50 hover:shadow-lg transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -74,7 +74,6 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">
-        {/* Chart */}
         <Card className="lg:col-span-4 hover:shadow-xl transition-shadow duration-300">
           <CardHeader>
             <CardTitle>Perbandingan Data</CardTitle>
@@ -99,9 +98,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         
-        {/* Recent Activities and Quick Access */}
         <div className="lg:col-span-3 flex flex-col gap-8">
-            {/* Quick Access */}
             <Card className="hover:shadow-xl transition-shadow duration-300">
                 <CardHeader>
                     <CardTitle>Akses Cepat</CardTitle>
@@ -139,7 +136,6 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
 
-            {/* Recent Activity */}
             <Card className="hover:shadow-xl transition-shadow duration-300">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><History className="h-5 w-5"/> Aktivitas Terbaru</CardTitle>
