@@ -39,8 +39,8 @@
       "siswa_nomorSttb": "DN-01/0001/2022",
       "siswa_tanggalSttb": "2022-06-20",
       "siswa_fotoProfil": {
-        "fileName": "avatar-ahmad.jpg",
-        "fileURL": ""
+        "fileName": "IMG-20260224-WA0264.jpg",
+        "fileURL": "/uploads/siswa/1771964693905.jpg"
       },
       "documents": {
         "kartuKeluarga": {
@@ -97,7 +97,7 @@
   "pegawai": [
     {
       "id": "201",
-      "pegawai_nama": "Drs. Mulyadi, M.Pd.",
+      "pegawai_nama": "Drs. Mulyadi, M.Pd.M",
       "pegawai_nip": "197501012000031001",
       "pegawai_nuptk": "1234567890123456",
       "pegawai_jabatan": "Kepala Sekolah",

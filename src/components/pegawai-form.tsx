@@ -109,13 +109,33 @@ export function PegawaiForm({ pegawaiData }: { pegawaiData?: Partial<Pegawai> & 
 function DataIdentitasPegawaiForm({ pegawaiData }: { pegawaiData?: Partial<Pegawai> & { id: string } }) {
   const { control, watch, setValue, getValues, formState: {isDirty} } = useFormContext<PegawaiFormData>();
   const { toast } = useToast();
-  const [preview, setPreview] = useState<string | null>(getValues('pegawai_phaspoto.fileURL') || null);
+  const [preview, setPreview] = useState<string | null>(null);
   
   const [allKabupatens, setAllKabupatens] = useState<Wilayah[]>([]);
   const [kecamatans, setKecamatans] = useState<Wilayah[]>([]);
 
   const alamatKabupaten = watch('pegawai_alamatKabupaten');
   
+  // Sinkronisasi foto profil untuk pratinjau
+  useEffect(() => {
+    let isMounted = true;
+    const fileURL = getValues('pegawai_phaspoto.fileURL');
+    if (fileURL && isMounted) {
+        setPreview(fileURL);
+    }
+
+    const subscription = watch((value, { name }) => {
+      if (name === 'pegawai_phaspoto' && isMounted) {
+        setPreview(value.pegawai_phaspoto?.fileURL ?? null);
+      }
+    });
+
+    return () => { 
+        isMounted = false;
+        subscription.unsubscribe();
+    };
+  }, [watch, getValues]);
+
   useEffect(() => {
     getKabupatens('11').then(setAllKabupatens);
     if (pegawaiData) {
@@ -126,6 +146,10 @@ function DataIdentitasPegawaiForm({ pegawaiData }: { pegawaiData?: Partial<Pegaw
   useEffect(() => {
       if (alamatKabupaten) {
           getKecamatans(alamatKabupaten).then(data => {
+              setAllKabupatens(prev => {
+                  // Ensure we have current regency in the list if editing
+                  return prev;
+              });
               setKecamatans(data);
               if(isDirty) { setValue('pegawai_alamatKecamatan', ''); setValue('pegawai_alamatDesa', ''); }
           });
@@ -207,14 +231,19 @@ function SingleFileUpload({ name, label }: { name: string, label: string }) {
         <FormItem>
             <FormLabel>{label}</FormLabel>
             <div className="flex items-center gap-4">
-                <Button asChild variant="outline" className="w-full justify-start">
-                    <label className="cursor-pointer">
-                        <UploadCloud className="mr-2 h-4 w-4" /> <span className="truncate">{watched?.fileName || 'Pilih file...'}</span>
+                <Button asChild variant="outline" className="w-full justify-start text-left font-normal">
+                    <label className="cursor-pointer flex items-center gap-2 overflow-hidden w-full">
+                        <UploadCloud className="mr-2 h-4 w-4 shrink-0" /> 
+                        <span className="truncate">{watched?.fileName || 'Pilih file...'}</span>
                         <input type="file" className="hidden" onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (file) {
-                                const url = await uploadFile(file);
-                                setValue(name, { fileName: file.name, fileURL: url }, { shouldDirty: true });
+                                try {
+                                    const url = await uploadFile(file);
+                                    setValue(name, { fileName: file.name, fileURL: url }, { shouldDirty: true });
+                                } catch (err) {
+                                    console.error("Upload error", err);
+                                }
                             }
                         }} />
                     </label>
@@ -232,9 +261,9 @@ function DataValidasiForm() {
         <ShieldCheck className="w-16 h-16 text-primary" />
         <h2 className="text-2xl font-bold">Konfirmasi</h2>
         <p className="text-muted-foreground">Periksa kembali data Anda sebelum menyimpan.</p>
-        <div className="w-full max-w-md p-4 border rounded-lg text-left">
-            <p><strong>Nama:</strong> {values.pegawai_nama}</p>
-            <p><strong>NIP:</strong> {values.pegawai_nip}</p>
+        <div className="w-full max-w-md p-4 border rounded-lg text-left bg-muted/30">
+            <p className="flex justify-between"><strong>Nama:</strong> <span>{values.pegawai_nama || '-'}</span></p>
+            <p className="flex justify-between"><strong>NIP:</strong> <span>{values.pegawai_nip || '-'}</span></p>
         </div>
     </div>
   )
