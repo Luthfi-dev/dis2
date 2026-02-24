@@ -1,18 +1,17 @@
-
 'use client';
-import { getPegawaiById } from '../../../../../lib/actions';
-import { Pegawai } from '../../../../../lib/pegawai-data';
+import { getPegawaiById } from '@/lib/actions';
+import { Pegawai } from '@/lib/pegawai-data';
 import { notFound } from 'next/navigation';
-import { Button } from '../../../../../components/ui/button';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, Printer, User, Calendar, MapPin, Briefcase, Home, Users, HeartHandshake, School, GraduationCap, FileText, CheckCircle2, XCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { Skeleton } from '../../../../../components/ui/skeleton';
-import { Separator } from '../../../../../components/ui/separator';
-import { Badge } from '../../../../../components/ui/badge';
-import { cn } from '../../../../../lib/utils';
-import { getDesaName, getKecamatanName, getKabupatenName } from '../../../../../lib/wilayah';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { getDesaName, getKecamatanName, getKabupatenName } from '@/lib/wilayah';
 
 function InfoRow({ label, value, icon, className }: { label: string, value?: React.ReactNode, icon?: React.ElementType, className?: string }) {
     const Icon = icon;
@@ -204,12 +203,12 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
                         <FileRow label="Karpeg" document={pegawai.pegawai_karpeg} />
                         <FileRow label="Karis/Karsu" document={pegawai.pegawai_karisKarsu} />
                         <FileRow label="Buku Nikah" document={pegawai.pegawai_bukuNikah} />
-                        <FileRow label="Kartu Keluarga" document={pegawai.pegawai_kartu Keluarga} />
+                        <FileRow label="Kartu Keluarga" document={pegawai.pegawai_kartuKeluarga} />
                         <FileRow label="KTP" document={pegawai.pegawai_ktp} />
-                        <FileRow label="Akte Kelahiran" document={pegawai.pegawai_akte Kelahiran} />
-                        <FileRow label="Kartu Taspen" document={pegawai.pegawai_kartu Taspen} />
+                        <FileRow label="Akte Kelahiran" document={pegawai.pegawai_akteKelahiran} />
+                        <FileRow label="Kartu Taspen" document={pegawai.pegawai_kartuTaspen} />
                         <FileRow label="NPWP" document={pegawai.pegawai_npwp} />
-                        <FileRow label="Kartu BPJS" document={pegawai.pegawai_kartu Bpjs} />
+                        <FileRow label="Kartu BPJS" document={pegawai.pegawai_kartuBpjs} />
                         <FileRow label="Buku Rekening Gaji" document={pegawai.pegawai_bukuRekening} />
                     </div>
                 </section>
