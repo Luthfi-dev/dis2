@@ -12,14 +12,16 @@ const UPLOADS_DIR = path.join(process.cwd(), '..', 'uploads');
 
 export async function GET(
   req: NextRequest,
-  {params}: {params: {path: string[]}}
+  {params}: {params: Promise<{path: string[]}>}
 ) {
   // Prevent this route from being accessed in production
   if (process.env.NODE_ENV === 'production') {
     return new NextResponse('Not found', {status: 404});
   }
 
-  const filePath = path.join(UPLOADS_DIR, ...params.path);
+  // Next.js 15: params must be awaited
+  const { path: pathSegments } = await params;
+  const filePath = path.join(UPLOADS_DIR, ...pathSegments);
 
   try {
     await fs.promises.access(filePath, fs.constants.F_OK);

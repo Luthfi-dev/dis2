@@ -1,19 +1,18 @@
 
 import type {NextConfig} from 'next';
-import path from 'path';
 
 const nextConfig: NextConfig = {
-  // Output standalone sangat optimal untuk hosting (Vercel, VPS, dll)
+  // Output standalone sangat optimal untuk hosting modern (Docker, Vercel, VPS)
   output: 'standalone',
   
-  // Keamanan: Sembunyikan informasi server
+  // Keamanan: Sembunyikan informasi identitas server
   poweredByHeader: false,
   
-  // Optimasi: Kompresi aset otomatis
+  // Optimasi: Kompresi aset otomatis untuk menghemat bandwidth
   compress: true,
 
   typescript: {
-    // Pastikan build gagal jika ada error type demi keamanan data
+    // Pastikan build gagal jika ada error type demi keamanan data di produksi
     ignoreBuildErrors: false,
   },
   
@@ -34,11 +33,8 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Konfigurasi tambahan untuk mencegah 'garbage files' di root
-  // Next.js menggunakan .next/cache secara default. 
-  // Penulisan file acak biasanya berasal dari sistem native atau telemetry.
   experimental: {
-    // Mengurangi penggunaan memori saat build
+    // Optimasi penggunaan memori saat build untuk mencegah crash di server kecil
     workerThreads: true,
     cpus: 2,
   },
