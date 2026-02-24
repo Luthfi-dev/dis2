@@ -1,14 +1,11 @@
 
-// src/app/api/dev-uploads/[...path]/route.ts
 import {NextRequest, NextResponse} from 'next/server';
 import path from 'path';
 import fs from 'fs';
 import mime from 'mime';
 
-// This route is for DEVELOPMENT ONLY to proxy requests from the Next.js dev server
-// to the file system, mimicking the production rewrite behavior.
-
-const UPLOADS_DIR = path.join(process.cwd(), '..', 'uploads');
+// Konsisten menggunakan folder lokal proyek
+const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
 
 export async function GET(
   req: NextRequest,
@@ -19,7 +16,6 @@ export async function GET(
     return new NextResponse('Not found', {status: 404});
   }
 
-  // Next.js 15: params must be awaited
   const { path: pathSegments } = await params;
   const filePath = path.join(UPLOADS_DIR, ...pathSegments);
 

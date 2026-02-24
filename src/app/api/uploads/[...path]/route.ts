@@ -4,7 +4,8 @@ import path from 'path';
 import fs from 'fs';
 import mime from 'mime';
 
-const UPLOADS_DIR = path.join(process.cwd(), '..', 'uploads');
+// Harus sama dengan direktori di API upload
+const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
 
 export async function GET(
   req: NextRequest,
@@ -28,6 +29,7 @@ export async function GET(
     headers: {
       'Content-Type': mimeType,
       'Content-Length': fileContents.length.toString(),
+      'Cache-Control': 'public, max-age=31536000, immutable',
     },
   });
 }

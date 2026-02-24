@@ -3,10 +3,9 @@ import { writeFile, mkdir } from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import { join, extname } from 'path';
 import sharp from 'sharp';
-import os from 'os';
 
-// Tentukan direktori upload
-const UPLOADS_DIR = join(process.cwd(), '..', 'uploads');
+// Tentukan direktori upload di DALAM proyek agar tidak ditolak hosting
+const UPLOADS_DIR = join(process.cwd(), 'uploads');
 
 export async function POST(request: NextRequest) {
   const data = await request.formData();
@@ -27,13 +26,14 @@ export async function POST(request: NextRequest) {
   const path = join(targetDir, filename);
 
   try {
+    // Pastikan folder tersedia di dalam area kerja proyek
     await mkdir(targetDir, { recursive: true });
 
     const isImage = file.type.startsWith('image/');
     let fileBufferToSave = buffer;
 
     if (isImage) {
-        // Konfigurasi Sharp agar tidak menulis cache ke root
+        // PAKSA Sharp untuk tidak menulis cache ke disk (mencegah file sampah acak)
         sharp.cache(false); 
         
         fileBufferToSave = await sharp(buffer)
