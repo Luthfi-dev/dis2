@@ -1,5 +1,3 @@
-
-// src/app/api/uploads/[...path]/route.ts
 import {NextRequest, NextResponse} from 'next/server';
 import path from 'path';
 import fs from 'fs';
@@ -9,9 +7,10 @@ const UPLOADS_DIR = path.join(process.cwd(), '..', 'uploads');
 
 export async function GET(
   req: NextRequest,
-  {params}: {params: {path: string[]}}
+  {params}: {params: Promise<{path: string[]}>}
 ) {
-  const filePath = path.join(UPLOADS_DIR, ...params.path);
+  const { path: pathSegments } = await params;
+  const filePath = path.join(UPLOADS_DIR, ...pathSegments);
 
   try {
     await fs.promises.access(filePath, fs.constants.F_OK);

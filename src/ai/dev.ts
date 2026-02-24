@@ -1,4 +1,1 @@
-import { config } from 'dotenv';
-config();
-
-import '@/ai/flows/suggest-upload-category.ts';
+// File nonaktif - Aplikasi ini non-AI

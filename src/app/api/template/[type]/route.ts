@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import Excel from 'exceljs';
 
@@ -63,9 +62,9 @@ const pegawaiDummy = {
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { type: string } }
+    { params }: { params: Promise<{ type: string }> }
 ) {
-    const type = params.type;
+    const { type } = await params;
 
     let headers, dummyData, fileName;
 
