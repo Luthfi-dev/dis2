@@ -70,10 +70,6 @@
         "tamatTahun": "1998",
         "ijazah": { "fileName": "ijazah_s1_mulyadi.pdf", "fileURL": "#" }
       },
-      "pegawai_pendidikanS2": {
-        "tamatTahun": "2005",
-        "ijazah": { "fileName": "ijazah_s2_mulyadi.pdf", "fileURL": "#" }
-      },
       "pegawai_phaspoto": {
         "fileName": "mulyadi.jpg",
         "fileURL": "https://picsum.photos/seed/201/300/400"
@@ -81,7 +77,9 @@
       "pegawai_skPengangkatan": [
         { "fileName": "SK_CPNS_2000.pdf", "fileURL": "#" },
         { "fileName": "SK_PNS_2001.pdf", "fileURL": "#" }
-      ]
+      ],
+      "pegawai_ktp": { "fileName": "KTP_Mulyadi.jpg", "fileURL": "#" },
+      "pegawai_kartuKeluarga": { "fileName": "KK_Mulyadi.pdf", "fileURL": "#" }
     }
   ],
   "users": [
@@ -91,7 +89,7 @@
       "name": "Super Admin",
       "role": "superadmin",
       "status": "active",
-      "password": "$2a$10$K6Z6Y6Z6Y6Z6Y6Z6Y6Z6YuP6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y"
+      "password": "$2a$10$6K68kxFjrP0TdPta2q4Z.ub0liE1IB1dU5kCTR1Z77Bqj2AtSSrP6"
     },
     {
       "id": "2",
@@ -99,7 +97,7 @@
       "name": "Admin Sekolah",
       "role": "admin",
       "status": "active",
-      "password": "$2a$10$K6Z6Y6Z6Y6Z6Y6Z6Y6Z6YuP6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y"
+      "password": "$2a$10$6K68kxFjrP0TdPta2q4Z.ub0liE1IB1dU5kCTR1Z77Bqj2AtSSrP6"
     }
   ],
   "app_settings": [

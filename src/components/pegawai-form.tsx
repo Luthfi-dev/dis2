@@ -1,25 +1,18 @@
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import { useForm, FormProvider, useFormContext, useFieldArray } from 'react-hook-form';
+import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 import { FormStepper } from './form-stepper';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { useToast } from '../hooks/use-toast';
-import { Loader2, ArrowLeft, ArrowRight, CalendarIcon, UploadCloud, User, FileCheck2, Trash2, ShieldCheck } from 'lucide-react';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
+import { Loader2, ArrowLeft, ArrowRight, UploadCloud, User, ShieldCheck } from 'lucide-react';
+import { Form, FormControl, FormField, FormItem, FormLabel } from './ui/form';
 import { Input } from './ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel as RadixSelectLabel } from './ui/select';
-import { RadioGroup, RadioGroupItem } from './ui/radio-group';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import { Calendar } from './ui/calendar';
-import { format } from 'date-fns';
-import { cn } from '../lib/utils';
 import { submitPegawaiData } from '../lib/actions';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { Pegawai, PegawaiFormData } from '../lib/pegawai-data';
 import Image from 'next/image';
-import { Separator } from './ui/separator';
 import { getKabupatens, getKecamatans, getDesas, Wilayah } from '../lib/wilayah';
 import { Combobox } from './ui/combobox';
 import { logActivity } from '../lib/activity-log';
@@ -120,16 +113,13 @@ function DataIdentitasPegawaiForm({ pegawaiData }: { pegawaiData?: Partial<Pegaw
   
   const [allKabupatens, setAllKabupatens] = useState<Wilayah[]>([]);
   const [kecamatans, setKecamatans] = useState<Wilayah[]>([]);
-  const [desas, setDesas] = useState<Wilayah[]>([]);
 
   const alamatKabupaten = watch('pegawai_alamatKabupaten');
-  const alamatKecamatan = watch('pegawai_alamatKecamatan');
   
   useEffect(() => {
     getKabupatens('11').then(setAllKabupatens);
     if (pegawaiData) {
         if(pegawaiData.pegawai_alamatKabupaten) getKecamatans(pegawaiData.pegawai_alamatKabupaten).then(setKecamatans);
-        if(pegawaiData.pegawai_alamatKecamatan) getDesas(pegawaiData.pegawai_alamatKecamatan).then(setDesas);
     }
   }, [pegawaiData]);
   
@@ -141,15 +131,6 @@ function DataIdentitasPegawaiForm({ pegawaiData }: { pegawaiData?: Partial<Pegaw
           });
       }
   }, [alamatKabupaten, setValue, isDirty]);
-
-  useEffect(() => {
-      if (alamatKecamatan) {
-          getDesas(alamatKecamatan).then(data => {
-              setDesas(data);
-              if(isDirty) setValue('pegawai_alamatDesa', '');
-          });
-      }
-  }, [alamatKecamatan, setValue, isDirty]);
 
   const wilayahToOptions = (wilayah: Wilayah[]) => wilayah.map(w => ({ value: w.id, label: w.name }));
   
@@ -213,7 +194,7 @@ function FilePegawaiForm() {
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <SingleFileUpload name="pegawai_skNipBaru" label="SK NIP Baru" />
                 <SingleFileUpload name="pegawai_ktp" label="KTP" />
-                <SingleFileUpload name="pegawai_kartu Keluarga" label="Kartu Keluarga" />
+                <SingleFileUpload name="pegawai_kartuKeluarga" label="Kartu Keluarga" />
             </div>
         </div>
     )
