@@ -1,4 +1,3 @@
-
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -12,17 +11,17 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   useSidebar,
-} from '@/components/ui/sidebar';
+} from './ui/sidebar';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { Button } from '@/components/ui/button';
+} from './ui/collapsible';
+import { Button } from './ui/button';
 import { BookCopy, GraduationCap, Plus, Users, Settings, LogOut, ChevronsUpDown, Database, ShieldCheck, Briefcase, LayoutDashboard } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/use-auth';
-import { useAppSettings } from '@/hooks/use-app-settings';
+import { cn } from '../lib/utils';
+import { useAuth } from '../hooks/use-auth';
+import { useAppSettings } from '../hooks/use-app-settings';
 import Image from 'next/image';
 
 

@@ -1,8 +1,8 @@
 import './globals.css';
-import { Toaster } from '@/components/ui/toaster';
-import { AuthProvider } from '@/hooks/use-auth';
-import { ThemeProvider } from '@/components/theme-provider';
-import { AppSettingsProvider } from '@/hooks/use-app-settings';
+import { Toaster } from '../components/ui/toaster';
+import { AuthProvider } from '../hooks/use-auth';
+import { ThemeProvider } from '../components/theme-provider';
+import { AppSettingsProvider } from '../hooks/use-app-settings';
 import { AppMetadata } from './metadata';
 
 export default function RootLayout({

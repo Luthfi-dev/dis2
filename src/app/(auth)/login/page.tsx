@@ -1,18 +1,17 @@
-
 'use client';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/use-auth';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Label } from '../../../components/ui/label';
+import { useToast } from '../../../hooks/use-toast';
+import { useAuth } from '../../../hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { Loader2, GraduationCap } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAppSettings } from '@/hooks/use-app-settings';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
+import { useAppSettings } from '../../../hooks/use-app-settings';
 import Image from 'next/image';
 
 const loginSchema = z.object({
@@ -54,7 +53,6 @@ function Illustration() {
     </svg>
   );
 }
-
 
 export default function LoginPage() {
   const [isPending, startTransition] = useTransition();
@@ -146,5 +144,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    

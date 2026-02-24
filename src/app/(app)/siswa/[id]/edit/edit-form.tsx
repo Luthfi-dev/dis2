@@ -1,11 +1,10 @@
-
 'use client';
-import { StudentForm } from '@/components/student-form';
-import { getSiswaById } from '@/lib/actions';
+import { StudentForm } from '../../../../../components/student-form';
+import { getSiswaById } from '../../../../../lib/actions';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import type { Siswa } from '@/lib/data';
+import { Skeleton } from '../../../../../components/ui/skeleton';
+import type { Siswa } from '../../../../../lib/data';
 
 export function EditStudentForm({ studentId }: { studentId: string }) {
   const [student, setStudent] = useState<Siswa | null>(null);

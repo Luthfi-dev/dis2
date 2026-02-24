@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
@@ -52,15 +51,6 @@ async function uploadFile(file: File) {
     const { url } = await response.json();
     return url;
 }
-
-const dateStringToDate = (dateString?: string | Date): Date | undefined => {
-    if (!dateString) return undefined;
-    if (dateString instanceof Date) return dateString;
-    const datePart = dateString.split('T')[0];
-    const [year, month, day] = datePart.split('-').map(Number);
-    if (year && month && day) return new Date(Date.UTC(year, month - 1, day));
-    return undefined;
-};
 
 export function PegawaiForm({ pegawaiData }: { pegawaiData?: Partial<Pegawai> & { id: string } }) {
   const searchParams = useSearchParams();
@@ -176,19 +166,6 @@ function DataIdentitasPegawaiForm({ pegawaiData }: { pegawaiData?: Partial<Pegaw
     }
   };
 
-  const handlePendidikanFileChange = async (e: React.ChangeEvent<HTMLInputElement>, fieldName: any) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      try {
-        const fileURL = await uploadFile(file);
-        const current = getValues(fieldName);
-        setValue(fieldName, { ...current, ijazah: { fileName: file.name, fileURL } }, { shouldDirty: true });
-      } catch (error) {
-         toast({ title: 'Gagal', variant: 'destructive' });
-      }
-    }
-  };
-
   return (
     <div className="space-y-6">
        <FormField control={control} name="pegawai_phaspoto" render={() => (
@@ -236,7 +213,7 @@ function FilePegawaiForm() {
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <SingleFileUpload name="pegawai_skNipBaru" label="SK NIP Baru" />
                 <SingleFileUpload name="pegawai_ktp" label="KTP" />
-                <SingleFileUpload name="pegawai_kartuKeluarga" label="Kartu Keluarga" />
+                <SingleFileUpload name="pegawai_kartu Keluarga" label="Kartu Keluarga" />
             </div>
         </div>
     )

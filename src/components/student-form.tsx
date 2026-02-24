@@ -1,31 +1,30 @@
-
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
 import { useForm, FormProvider, useFormContext, get } from 'react-hook-form';
 import { FormStepper } from './form-stepper';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
+import { useToast } from '../hooks/use-toast';
 import { Loader2, ArrowLeft, ArrowRight, CalendarIcon, UploadCloud, FileCheck2, User, ShieldCheck } from 'lucide-react';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
+import { Input } from './ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Calendar } from './ui/calendar';
 import { format, parse, isValid } from 'date-fns';
-import { cn } from '@/lib/utils';
-import { submitStudentData } from '@/lib/actions';
+import { cn } from '../lib/utils';
+import { submitStudentData } from '../lib/actions';
 import { Textarea } from './ui/textarea';
 import { useRouter, useSearchParams } from 'next/navigation';
-import type { Siswa } from '@/lib/data';
-import type { StudentFormData } from '@/lib/student-data-t';
+import type { Siswa } from '../lib/data';
+import type { StudentFormData } from '../lib/student-data-t';
 import Image from 'next/image';
-import { getProvinces, getKabupatens, getKecamatans, getDesas, Wilayah } from '@/lib/wilayah';
+import { getProvinces, getKabupatens, getKecamatans, getDesas, Wilayah } from '../lib/wilayah';
 import { Combobox } from './ui/combobox';
 import { Separator } from './ui/separator';
-import { logActivity } from '@/lib/activity-log';
+import { logActivity } from '../lib/activity-log';
 
 const steps = [
   { id: 1, title: 'Data Siswa' },
@@ -66,17 +65,11 @@ async function uploadFile(file: File) {
 const dateStringToDate = (dateString?: string | Date): Date | undefined => {
     if (!dateString) return undefined;
     if (dateString instanceof Date) return dateString;
-    
-    // Split the string to handle both 'YYYY-MM-DD' and full ISO strings (YYYY-MM-DDTHH:mm:ss.sssZ)
     const datePart = dateString.split('T')[0];
     const [year, month, day] = datePart.split('-').map(Number);
-
     if (year && month && day) {
-        // Create a new Date in UTC to avoid timezone shifts. 
-        // JavaScript's Date constructor treats 'YYYY-MM-DD' as UTC midnight.
         return new Date(Date.UTC(year, month - 1, day));
     }
-
     return undefined;
 };
 
@@ -84,7 +77,6 @@ const dateStringToDate = (dateString?: string | Date): Date | undefined => {
 export function StudentForm({ studentData }: { studentData?: Partial<Siswa> & { id: string } }) {
   const searchParams = useSearchParams();
   const stepParam = searchParams.get('step');
-  const [isMounted, setIsMounted] = useState(false);
   const [currentStep, setCurrentStep] = useState(stepParam ? parseInt(stepParam, 10) : 1);
   const [isSubmitting, startTransition] = useTransition();
   const { toast } = useToast();
@@ -258,28 +250,20 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
 
   
   const [provinces, setProvinces] = useState<Wilayah[]>([]);
-  
-  // State for Alamat KK
   const [kkKabupatens, setKkKabupatens] = useState<Wilayah[]>([]);
   const [kkKecamatans, setKkKecamatans] = useState<Wilayah[]>([]);
   const [kkDesas, setKkDesas] = useState<Wilayah[]>([]);
-  
-  // State for Domisili
   const [domisiliKabupatens, setDomisiliKabupatens] = useState<Wilayah[]>([]);
   const [domisiliKecamatans, setDomisiliKecamatans] = useState<Wilayah[]>([]);
   const [domisiliDesas, setDomisiliDesas] = useState<Wilayah[]>([]);
 
-  // Watchers for Alamat KK
   const alamatKkProvinsi = watch('siswa_alamatKkProvinsi');
   const alamatKkKabupaten = watch('siswa_alamatKkKabupaten');
   const alamatKkKecamatan = watch('siswa_alamatKkKecamatan');
-  
-  // Watchers for Domisili
   const domisiliProvinsi = watch('siswa_domisiliProvinsi');
   const domisiliKabupaten = watch('siswa_domisiliKabupaten');
   const domisiliKecamatan = watch('siswa_domisiliKecamatan');
 
-  // Initial load for provinces and pre-filling dropdowns on edit
   useEffect(() => {
     let isMounted = true;
     getProvinces().then(data => isMounted && setProvinces(data));
@@ -287,7 +271,6 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
       if (studentData.siswa_alamatKkProvinsi) getKabupatens(studentData.siswa_alamatKkProvinsi).then(data => isMounted && setKkKabupatens(data));
       if (studentData.siswa_alamatKkKabupaten) getKecamatans(studentData.siswa_alamatKkKabupaten).then(data => isMounted && setKkKecamatans(data));
       if (studentData.siswa_alamatKkKecamatan) getDesas(studentData.siswa_alamatKkKecamatan).then(data => isMounted && setKkDesas(data));
-
       if (studentData.siswa_domisiliProvinsi) getKabupatens(studentData.siswa_domisiliProvinsi).then(data => isMounted && setDomisiliKabupatens(data));
       if (studentData.siswa_domisiliKabupaten) getKecamatans(studentData.siswa_domisiliKabupaten).then(data => isMounted && setDomisiliKecamatans(data));
       if (studentData.siswa_domisiliKecamatan) getDesas(studentData.siswa_domisiliKecamatan).then(data => isMounted && setDomisiliDesas(data));
@@ -295,12 +278,10 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
     return () => { isMounted = false };
   }, [studentData]);
 
-  // --- ISOLATED LOGIC FOR ALAMAT KK ---
   useEffect(() => {
     let isMounted = true;
-    const fetchKab = async () => {
-        if (alamatKkProvinsi) {
-            const data = await getKabupatens(alamatKkProvinsi)
+    if (alamatKkProvinsi) {
+        getKabupatens(alamatKkProvinsi).then(data => {
             if(isMounted) {
                 setKkKabupatens(data);
                 if (isDirty) {
@@ -309,17 +290,15 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
                     setValue('siswa_alamatKkDesa', '');
                 }
             }
-        }
-    };
-    fetchKab();
+        });
+    }
     return () => { isMounted = false };
   }, [alamatKkProvinsi, setValue, isDirty]);
 
   useEffect(() => {
     let isMounted = true;
-    const fetchKec = async () => {
-        if (alamatKkKabupaten) {
-            const data = await getKecamatans(alamatKkKabupaten);
+    if (alamatKkKabupaten) {
+        getKecamatans(alamatKkKabupaten).then(data => {
             if(isMounted) {
                 setKkKecamatans(data);
                 if (isDirty) {
@@ -327,35 +306,28 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
                     setValue('siswa_alamatKkDesa', '');
                 }
             }
-        }
-    };
-    fetchKec();
+        });
+    }
     return () => { isMounted = false };
   }, [alamatKkKabupaten, setValue, isDirty]);
 
   useEffect(() => {
     let isMounted = true;
-    const fetchDesa = async () => {
-        if (alamatKkKecamatan) {
-            const data = await getDesas(alamatKkKecamatan);
+    if (alamatKkKecamatan) {
+        getDesas(alamatKkKecamatan).then(data => {
             if(isMounted) {
                 setKkDesas(data);
-                if (isDirty) {
-                    setValue('siswa_alamatKkDesa', '');
-                }
+                if (isDirty) setValue('siswa_alamatKkDesa', '');
             }
-        }
-    };
-    fetchDesa();
+        });
+    }
     return () => { isMounted = false };
   }, [alamatKkKecamatan, setValue, isDirty]);
 
-   // --- ISOLATED LOGIC FOR DOMISILI ---
-   useEffect(() => {
+  useEffect(() => {
     let isMounted = true;
-    const fetchKab = async () => {
-        if (domisiliProvinsi) {
-            const data = await getKabupatens(domisiliProvinsi);
+    if (domisiliProvinsi) {
+        getKabupatens(domisiliProvinsi).then(data => {
             if(isMounted) {
                 setDomisiliKabupatens(data);
                 if (isDirty) {
@@ -364,17 +336,15 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
                     setValue('siswa_domisiliDesa', '');
                 }
             }
-        }
-    };
-    fetchKab();
+        });
+    }
     return () => { isMounted = false };
   }, [domisiliProvinsi, setValue, isDirty]);
 
   useEffect(() => {
     let isMounted = true;
-    const fetchKec = async () => {
-        if (domisiliKabupaten) {
-            const data = await getKecamatans(domisiliKabupaten);
+    if (domisiliKabupaten) {
+        getKecamatans(domisiliKabupaten).then(data => {
             if(isMounted) {
                 setDomisiliKecamatans(data);
                 if (isDirty) {
@@ -382,26 +352,21 @@ function DataSiswaForm({ studentData }: { studentData?: Partial<Siswa> & { id: s
                     setValue('siswa_domisiliDesa', '');
                 }
             }
-        }
-    };
-    fetchKec();
+        });
+    }
     return () => { isMounted = false };
   }, [domisiliKabupaten, setValue, isDirty]);
   
   useEffect(() => {
     let isMounted = true;
-    const fetchDesa = async () => {
-        if (domisiliKecamatan) {
-            const data = await getDesas(domisiliKecamatan);
+    if (domisiliKecamatan) {
+        getDesas(domisiliKecamatan).then(data => {
             if(isMounted) {
                 setDomisiliDesas(data);
-                if (isDirty) {
-                    setValue('siswa_domisiliDesa', '');
-                }
+                if (isDirty) setValue('siswa_domisiliDesa', '');
             }
-        }
-    };
-    fetchDesa();
+        });
+    }
     return () => { isMounted = false };
   }, [domisiliKecamatan, setValue, isDirty]);
 
@@ -877,13 +842,7 @@ function DocumentUploadField({ name, label }: DocumentUploadFieldProps) {
                       <FileCheck2 className="h-5 w-5" />
                       <span className="sr-only">Terunggah</span>
                   </div>
-              ) : (
-                !error && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    {/* Placeholder for when no file is uploaded */}
-                  </div>
-                )
-              )}
+              ) : null}
             </div>
             <FormMessage />
           </FormItem>
@@ -934,7 +893,7 @@ function DataValidasiForm() {
         { label: "Foto Profil", value: values.siswa_fotoProfil?.fileName },
         ...Object.entries(values.documents || {}).map(([key, value]) => ({
             label: `Dokumen: ${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}`,
-            value: value?.fileName
+            value: (value as any)?.fileName
         }))
     ].filter(field => field.value);
 

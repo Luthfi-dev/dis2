@@ -1,11 +1,10 @@
-
 'use client';
-import { PegawaiForm } from '@/components/pegawai-form';
-import { getPegawaiById } from '@/lib/actions';
+import { PegawaiForm } from '../../../../../components/pegawai-form';
+import { getPegawaiById } from '../../../../../lib/actions';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import type { Pegawai } from '@/lib/pegawai-data';
+import { Skeleton } from '../../../../../components/ui/skeleton';
+import type { Pegawai } from '../../../../../lib/pegawai-data';
 
 export function EditPegawaiForm({ pegawaiId }: { pegawaiId: string }) {
   const [pegawai, setPegawai] = useState<Pegawai | null>(null);
