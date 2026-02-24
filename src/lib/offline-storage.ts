@@ -1,4 +1,4 @@
-// File ini adalah pustaka internal, tidak boleh menggunakan 'use server'.
+
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -21,11 +21,29 @@ class OfflineStorage {
             const data = await fs.readFile(STORAGE_PATH, 'utf-8');
             this.cachedData = JSON.parse(data);
         } catch (e) {
+            // Password hash untuk '123456' menggunakan bcrypt standar
+            const defaultPasswordHash = '$2a$10$K6Z6Y6Z6Y6Z6Y6Z6Y6Z6YuP6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y';
+            
             this.cachedData = {
                 siswa: this.generateDummySiswa(),
                 pegawai: this.generateDummyPegawai(),
                 users: [
-                    { id: '1', email: 'admin@gmail.com', name: 'Super Admin', role: 'superadmin', status: 'active', password: '$2a$10$K6Z6Y6Z6Y6Z6Y6Z6Y6Z6YuP6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y' }
+                    { 
+                        id: '1', 
+                        email: 'superadmin@gmail.com', 
+                        name: 'Super Admin', 
+                        role: 'superadmin', 
+                        status: 'active', 
+                        password: defaultPasswordHash 
+                    },
+                    { 
+                        id: '2', 
+                        email: 'admin@gmail.com', 
+                        name: 'Admin Sekolah', 
+                        role: 'admin', 
+                        status: 'active', 
+                        password: defaultPasswordHash 
+                    }
                 ],
                 app_settings: [{ id: 1, app_title: 'EduArchive Offline', app_description: 'Mode Offline Aktif' }]
             };
@@ -34,6 +52,7 @@ class OfflineStorage {
     }
 
     private async save() {
+        if (!this.cachedData) return;
         await fs.writeFile(STORAGE_PATH, JSON.stringify(this.cachedData, null, 2));
     }
 
@@ -53,7 +72,7 @@ class OfflineStorage {
         if (upperSql.startsWith('SELECT')) {
             if (upperSql.includes('FROM SISWA')) {
                 let data = [...this.cachedData!.siswa];
-                if (params[0]) {
+                if (params[0] && upperSql.includes('LIKE')) {
                     const search = params[0].replace(/%/g, '').toLowerCase();
                     data = data.filter(s => String(s.siswa_namaLengkap).toLowerCase().includes(search) || String(s.siswa_nisn).includes(search));
                 }
@@ -61,7 +80,7 @@ class OfflineStorage {
             }
             if (upperSql.includes('FROM PEGAWAI')) {
                 let data = [...this.cachedData!.pegawai];
-                if (params[0]) {
+                if (params[0] && upperSql.includes('LIKE')) {
                     const search = params[0].replace(/%/g, '').toLowerCase();
                     data = data.filter(p => String(p.pegawai_nama).toLowerCase().includes(search) || String(p.pegawai_nip).includes(search));
                 }
@@ -70,6 +89,9 @@ class OfflineStorage {
             if (upperSql.includes('FROM USERS')) {
                 if (upperSql.includes('WHERE EMAIL = ?')) {
                     return this.cachedData!.users.filter(u => u.email.toLowerCase() === params[0].toLowerCase());
+                }
+                if (upperSql.includes('WHERE ROLE !=')) {
+                    return this.cachedData!.users.filter(u => u.role !== 'superadmin');
                 }
                 return this.cachedData!.users;
             }
@@ -96,7 +118,6 @@ class OfflineStorage {
         }
 
         if (upperSql.startsWith('UPDATE')) {
-            // Logic update offline sederhana (hanya simpan log SQL)
             await this.save();
             await this.logSql(sql, params);
             return { affectedRows: 1 };

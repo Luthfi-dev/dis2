@@ -1,0 +1,68 @@
+
+{
+  "siswa": [
+    {
+      "id": "101",
+      "siswa_namaLengkap": "Ahmad Subagja",
+      "siswa_nis": "2024001",
+      "siswa_nisn": "0012345671",
+      "siswa_jenisKelamin": "Laki-laki",
+      "status": "Lengkap",
+      "siswa_tempatLahir": "Jakarta",
+      "siswa_tanggalLahir": "2010-05-15"
+    },
+    {
+      "id": "102",
+      "siswa_namaLengkap": "Siti Aminah",
+      "siswa_nis": "2024002",
+      "siswa_nisn": "0012345672",
+      "siswa_jenisKelamin": "Perempuan",
+      "status": "Lengkap",
+      "siswa_tempatLahir": "Bandung",
+      "siswa_tanggalLahir": "2010-08-20"
+    }
+  ],
+  "pegawai": [
+    {
+      "id": "201",
+      "pegawai_nama": "Drs. Mulyadi, M.Pd.",
+      "pegawai_nip": "197501012000031001",
+      "pegawai_jabatan": "Kepala Sekolah",
+      "status": "Lengkap",
+      "pegawai_jenisKelamin": "Laki-laki"
+    },
+    {
+      "id": "202",
+      "pegawai_nama": "Rina Kartika, S.Pd.",
+      "pegawai_nip": "198805122015042002",
+      "pegawai_jabatan": "Guru Matematika",
+      "status": "Lengkap",
+      "pegawai_jenisKelamin": "Perempuan"
+    }
+  ],
+  "users": [
+    {
+      "id": "1",
+      "email": "superadmin@gmail.com",
+      "name": "Super Admin",
+      "role": "superadmin",
+      "status": "active",
+      "password": "$2a$10$K6Z6Y6Z6Y6Z6Y6Z6Y6Z6YuP6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y"
+    },
+    {
+      "id": "2",
+      "email": "admin@gmail.com",
+      "name": "Admin Sekolah",
+      "role": "admin",
+      "status": "active",
+      "password": "$2a$10$K6Z6Y6Z6Y6Z6Y6Z6Y6Z6YuP6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y"
+    }
+  ],
+  "app_settings": [
+    {
+      "id": 1,
+      "app_title": "EduArchive Offline",
+      "app_description": "Mode Offline Aktif"
+    }
+  ]
+}

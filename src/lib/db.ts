@@ -1,4 +1,4 @@
-// Pustaka internal database, tidak boleh 'use server'.
+
 import mysql from 'mysql2/promise';
 import { config } from 'dotenv';
 import { offlineStorage } from './offline-storage';
@@ -7,11 +7,12 @@ config();
 
 const isOffline = process.env.STATUS_DB === 'offline';
 
+// Konfigurasi DB dikosongkan untuk keamanan
 const dbConfig = {
-    host: process.env.DB_HOST || '41.216.185.84',
-    user: process.env.DB_USER || 'smpnbire_adm',
-    password: process.env.DB_PASSWORD || 'S1m1n123456_',
-    database: process.env.DB_DATABASE || 'smpnbire_siemins',
+    host: process.env.DB_HOST || '',
+    user: process.env.DB_USER || '',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_DATABASE || '',
     port: parseInt(process.env.DB_PORT || '3306', 10),
     waitForConnections: true,
     connectionLimit: 10,
@@ -41,11 +42,13 @@ export default async function getDB(): Promise<DBInterface> {
             beginTransaction: async () => {},
             commit: async () => {},
             rollback: async () => {},
-            release: () => {} // No-op for offline
+            release: () => {} 
         };
     }
 
     if (!pool) {
+        // Jika parameter kosong, mysql2 mungkin melempar error saat pembuatan pool
+        // Pastikan env diisi sebelum beralih ke mode online
         pool = mysql.createPool(dbConfig);
     }
 
