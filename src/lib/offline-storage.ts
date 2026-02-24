@@ -17,40 +17,14 @@ class OfflineStorage {
 
     private async init() {
         if (this.cachedData) return;
-        
-        // Password hash untuk '123456' menggunakan bcrypt standar
-        const defaultPasswordHash = '$2a$10$K6Z6Y6Z6Y6Z6Y6Z6Y6Z6YuP6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y';
-        
         try {
             const data = await fs.readFile(STORAGE_PATH, 'utf-8');
             this.cachedData = JSON.parse(data);
-            
-            // Pastikan tabel users ada jika file sudah ada namun versi lama
-            if (!this.cachedData!.users) {
-                this.cachedData!.users = [
-                    { 
-                        id: '1', 
-                        email: 'superadmin@gmail.com', 
-                        name: 'Super Admin', 
-                        role: 'superadmin', 
-                        status: 'active', 
-                        password: defaultPasswordHash 
-                    },
-                    { 
-                        id: '2', 
-                        email: 'admin@gmail.com', 
-                        name: 'Admin Sekolah', 
-                        role: 'admin', 
-                        status: 'active', 
-                        password: defaultPasswordHash 
-                    }
-                ];
-                await this.save();
-            }
         } catch (e) {
+            // Revert to minimal structure if file doesn't exist
             this.cachedData = {
-                siswa: this.generateDummySiswa(),
-                pegawai: this.generateDummyPegawai(),
+                siswa: [],
+                pegawai: [],
                 users: [
                     { 
                         id: '1', 
@@ -58,15 +32,7 @@ class OfflineStorage {
                         name: 'Super Admin', 
                         role: 'superadmin', 
                         status: 'active', 
-                        password: defaultPasswordHash 
-                    },
-                    { 
-                        id: '2', 
-                        email: 'admin@gmail.com', 
-                        name: 'Admin Sekolah', 
-                        role: 'admin', 
-                        status: 'active', 
-                        password: defaultPasswordHash 
+                        password: '$2a$10$K6Z6Y6Z6Y6Z6Y6Z6Y6Z6YuP6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y' 
                     }
                 ],
                 app_settings: [{ id: 1, app_title: 'EduArchive Offline', app_description: 'Mode Offline Aktif' }]
@@ -97,16 +63,22 @@ class OfflineStorage {
             if (upperSql.includes('FROM SISWA')) {
                 let data = [...this.cachedData!.siswa];
                 if (params[0] && upperSql.includes('LIKE')) {
-                    const search = params[0].replace(/%/g, '').toLowerCase();
+                    const search = String(params[0]).replace(/%/g, '').toLowerCase();
                     data = data.filter(s => String(s.siswa_namaLengkap).toLowerCase().includes(search) || String(s.siswa_nisn).includes(search));
+                }
+                if (upperSql.includes('WHERE ID = ?')) {
+                    return data.filter(s => s.id.toString() === params[0].toString());
                 }
                 return data;
             }
             if (upperSql.includes('FROM PEGAWAI')) {
                 let data = [...this.cachedData!.pegawai];
                 if (params[0] && upperSql.includes('LIKE')) {
-                    const search = params[0].replace(/%/g, '').toLowerCase();
+                    const search = String(params[0]).replace(/%/g, '').toLowerCase();
                     data = data.filter(p => String(p.pegawai_nama).toLowerCase().includes(search) || String(p.pegawai_nip).includes(search));
+                }
+                if (upperSql.includes('WHERE ID = ?')) {
+                    return data.filter(p => p.id.toString() === params[0].toString());
                 }
                 return data;
             }
@@ -116,6 +88,9 @@ class OfflineStorage {
                 }
                 if (upperSql.includes('WHERE ROLE !=')) {
                     return this.cachedData!.users.filter(u => u.role !== 'superadmin');
+                }
+                if (upperSql.includes('WHERE ID = ?')) {
+                    return this.cachedData!.users.filter(u => u.id.toString() === params[0].toString());
                 }
                 return this.cachedData!.users;
             }
@@ -131,7 +106,12 @@ class OfflineStorage {
                 const newData: any = { id: newId };
                 columns.forEach((col, idx) => {
                     let val = params[idx];
-                    try { if(typeof val === 'string' && (val.startsWith('{') || val.startsWith('['))) val = JSON.parse(val); } catch(e) {}
+                    // Logic sinkron: jika params adalah JSON string, parse agar file .json tetap terstruktur
+                    try { 
+                        if(typeof val === 'string' && (val.startsWith('{') || val.startsWith('['))) {
+                            val = JSON.parse(val);
+                        }
+                    } catch(e) {}
                     newData[col] = val;
                 });
                 (this.cachedData as any)[table].push(newData);
@@ -142,35 +122,50 @@ class OfflineStorage {
         }
 
         if (upperSql.startsWith('UPDATE')) {
-            await this.save();
-            await this.logSql(sql, params);
-            return { affectedRows: 1 };
+            const table = upperSql.includes('SISWA') ? 'siswa' : (upperSql.includes('PEGAWAI') ? 'pegawai' : (upperSql.includes('USERS') ? 'users' : 'app_settings'));
+            
+            // Simpulkan update berdasarkan data terbaru (karena ini simulasi offline)
+            // Dalam implementasi nyata, kita harus mencari ID di params terakhir
+            const id = params[params.length - 1];
+            const targetIndex = (this.cachedData as any)[table].findIndex((item: any) => item.id.toString() === id?.toString());
+            
+            if (targetIndex !== -1) {
+                // Ekstrak kolom dari SQL UPDATE table SET col1 = ?, col2 = ? WHERE id = ?
+                const setMatch = sql.match(/SET (.*?) WHERE/i);
+                if (setMatch) {
+                    const sets = setMatch[1].split(',').map(s => s.trim().split('=')[0].trim());
+                    sets.forEach((col, idx) => {
+                        let val = params[idx];
+                        try { 
+                            if(typeof val === 'string' && (val.startsWith('{') || val.startsWith('['))) {
+                                val = JSON.parse(val);
+                            }
+                        } catch(e) {}
+                        (this.cachedData as any)[table][targetIndex][col] = val;
+                    });
+                } else if (table === 'app_settings') {
+                    // Penanganan khusus app_settings (biasanya id=1 fixed)
+                    (this.cachedData as any)[table][0].app_title = params[0];
+                    (this.cachedData as any)[table][0].app_description = params[1];
+                    (this.cachedData as any)[table][0].app_logo_url = params[2];
+                }
+                
+                await this.save();
+                await this.logSql(sql, params);
+                return { affectedRows: 1 };
+            }
         }
 
         if (upperSql.startsWith('DELETE')) {
             const table = upperSql.includes('SISWA') ? 'siswa' : (upperSql.includes('PEGAWAI') ? 'pegawai' : 'users');
             const id = params[0];
-            (this.cachedData as any)[table] = (this.cachedData as any)[table].filter((item: any) => item.id.toString() !== id.toString());
+            (this.cachedData as any)[table] = (this.cachedData as any)[table].filter((item: any) => item.id.toString() !== id?.toString());
             await this.save();
             await this.logSql(sql, params);
             return { affectedRows: 1 };
         }
 
         return [];
-    }
-
-    private generateDummySiswa() {
-        return [
-            { id: '101', siswa_namaLengkap: 'Ahmad Subagja', siswa_nis: '2024001', siswa_nisn: '0012345671', siswa_jenisKelamin: 'Laki-laki', status: 'Lengkap', siswa_tempatLahir: 'Jakarta', siswa_tanggalLahir: '2010-05-15' },
-            { id: '102', siswa_namaLengkap: 'Siti Aminah', siswa_nis: '2024002', siswa_nisn: '0012345672', siswa_jenisKelamin: 'Perempuan', status: 'Lengkap', siswa_tempatLahir: 'Bandung', siswa_tanggalLahir: '2010-08-20' }
-        ];
-    }
-
-    private generateDummyPegawai() {
-        return [
-            { id: '201', pegawai_nama: 'Drs. Mulyadi, M.Pd.', pegawai_nip: '197501012000031001', pegawai_jabatan: 'Kepala Sekolah', status: 'Lengkap', pegawai_jenisKelamin: 'Laki-laki' },
-            { id: '202', pegawai_nama: 'Rina Kartika, S.Pd.', pegawai_nip: '198805122015042002', pegawai_jabatan: 'Guru Matematika', status: 'Lengkap', pegawai_jenisKelamin: 'Perempuan' }
-        ];
     }
 }
 

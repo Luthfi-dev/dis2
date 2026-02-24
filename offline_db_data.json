@@ -9,17 +9,44 @@
       "siswa_jenisKelamin": "Laki-laki",
       "status": "Lengkap",
       "siswa_tempatLahir": "Jakarta",
-      "siswa_tanggalLahir": "2010-05-15"
-    },
-    {
-      "id": "102",
-      "siswa_namaLengkap": "Siti Aminah",
-      "siswa_nis": "2024002",
-      "siswa_nisn": "0012345672",
-      "siswa_jenisKelamin": "Perempuan",
-      "status": "Lengkap",
-      "siswa_tempatLahir": "Bandung",
-      "siswa_tanggalLahir": "2010-08-20"
+      "siswa_tanggalLahir": "2010-05-15",
+      "siswa_agama": "Islam",
+      "siswa_kewarganegaraan": "WNI",
+      "siswa_jumlahSaudara": 2,
+      "siswa_bahasa": "Indonesia",
+      "siswa_golonganDarah": "O",
+      "siswa_telepon": "081234567890",
+      "siswa_alamatKkProvinsi": "32",
+      "siswa_alamatKkKabupaten": "3273",
+      "siswa_alamatKkKecamatan": "3273010",
+      "siswa_alamatKkDesa": "3273010001",
+      "siswa_domisiliProvinsi": "32",
+      "siswa_domisiliKabupaten": "3273",
+      "siswa_domisiliKecamatan": "3273010",
+      "siswa_domisiliDesa": "3273010001",
+      "siswa_tinggiBadan": 165,
+      "siswa_beratBadan": 55,
+      "siswa_penyakit": "Tidak ada",
+      "siswa_kelainanJasmani": "Tidak ada",
+      "siswa_namaAyah": "Budi Subagja",
+      "siswa_namaIbu": "Siti Aminah",
+      "siswa_pendidikanAyah": "S1 Teknik",
+      "siswa_pekerjaanAyah": "Wiraswasta",
+      "siswa_pendidikanIbu": "SMA",
+      "siswa_pekerjaanIbu": "Ibu Rumah Tangga",
+      "siswa_alamatOrangTua": "Jl. Merdeka No. 123, Bandung",
+      "siswa_teleponOrangTua": "081299998888",
+      "siswa_asalSekolah": "SD Negeri 1 Jakarta",
+      "siswa_nomorSttb": "DN-01/0001/2022",
+      "siswa_tanggalSttb": "2022-06-20",
+      "siswa_fotoProfil": {
+        "fileName": "avatar-ahmad.jpg",
+        "fileURL": "https://picsum.photos/seed/101/200/200"
+      },
+      "documents": {
+        "kartuKeluarga": { "fileName": "KK_Ahmad.pdf", "fileURL": "#" },
+        "ijazah": { "fileName": "Ijazah_SD_Ahmad.pdf", "fileURL": "#" }
+      }
     }
   ],
   "pegawai": [
@@ -27,17 +54,35 @@
       "id": "201",
       "pegawai_nama": "Drs. Mulyadi, M.Pd.",
       "pegawai_nip": "197501012000031001",
+      "pegawai_nuptk": "1234567890123456",
       "pegawai_jabatan": "Kepala Sekolah",
+      "pegawai_jenisKelamin": "Laki-laki",
+      "pegawai_tempatLahir": "Solo",
+      "pegawai_tanggalLahir": "1975-01-01",
+      "pegawai_statusPerkawinan": "Kawin",
+      "pegawai_bidangStudi": "Manajemen Pendidikan",
+      "pegawai_terhitungMulaiTanggal": "2000-03-01",
+      "pegawai_alamatKabupaten": "3273",
+      "pegawai_alamatKecamatan": "3273010",
+      "pegawai_alamatDesa": "3273010001",
+      "pegawai_alamatDusun": "Dusun Cemara",
       "status": "Lengkap",
-      "pegawai_jenisKelamin": "Laki-laki"
-    },
-    {
-      "id": "202",
-      "pegawai_nama": "Rina Kartika, S.Pd.",
-      "pegawai_nip": "198805122015042002",
-      "pegawai_jabatan": "Guru Matematika",
-      "status": "Lengkap",
-      "pegawai_jenisKelamin": "Perempuan"
+      "pegawai_pendidikanS1": {
+        "tamatTahun": "1998",
+        "ijazah": { "fileName": "ijazah_s1_mulyadi.pdf", "fileURL": "#" }
+      },
+      "pegawai_pendidikanS2": {
+        "tamatTahun": "2005",
+        "ijazah": { "fileName": "ijazah_s2_mulyadi.pdf", "fileURL": "#" }
+      },
+      "pegawai_phaspoto": {
+        "fileName": "mulyadi.jpg",
+        "fileURL": "https://picsum.photos/seed/201/300/400"
+      },
+      "pegawai_skPengangkatan": [
+        { "fileName": "SK_CPNS_2000.pdf", "fileURL": "#" },
+        { "fileName": "SK_PNS_2001.pdf", "fileURL": "#" }
+      ]
     }
   ],
   "users": [
@@ -62,7 +107,8 @@
     {
       "id": 1,
       "app_title": "EduArchive Offline",
-      "app_description": "Mode Offline Aktif"
+      "app_description": "Mode Offline Aktif - Audit Terverifikasi",
+      "app_logo_url": ""
     }
   ]
 }
