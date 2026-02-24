@@ -42,11 +42,11 @@ function FileRow({ label, document, isMulti = false }: { label: string, document
         value = (
             <ul className="list-disc list-inside space-y-1">
                 {document.map((doc: any, index: number) => (
-                    <li key={index} className="truncate">{doc.fileName}</li>
+                    <li key={index} className="truncate">{doc.fileName || 'Dokumen'}</li>
                 ))}
             </ul>
         );
-    } else if (!isMulti && document && document.fileName) {
+    } else if (!isMulti && document && typeof document === 'object' && 'fileName' in document) {
         value = document.fileName;
     }
 
@@ -120,10 +120,11 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
         </div>
 
         <main className="p-6 sm:p-10">
-            {/* Header */}
             <header className="flex flex-col sm:flex-row items-center gap-6 mb-8 text-center sm:text-left">
                 {pegawai.pegawai_phaspoto?.fileURL ? (
-                    <Image src={pegawai.pegawai_phaspoto.fileURL} alt="Foto Pegawai" width={128} height={170} className="border-4 border-primary/20 shadow-lg object-cover w-32 h-40" />
+                    <div className="relative w-32 h-40 border-4 border-primary/20 shadow-lg overflow-hidden rounded-lg">
+                        <Image src={pegawai.pegawai_phaspoto.fileURL} alt="Foto Pegawai" fill className="object-cover" />
+                    </div>
                 ) : (
                     <div className="w-32 h-40 rounded-lg bg-muted flex items-center justify-center border-4 border-primary/20 shadow-lg">
                         <User className="w-20 h-20 text-muted-foreground" />
