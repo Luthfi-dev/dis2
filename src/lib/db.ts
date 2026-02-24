@@ -7,11 +7,10 @@ config();
 
 /**
  * Konfigurasi database MySQL Remote.
- * Pastikan IP 195.88.211.130 telah mengizinkan koneksi (whitelisting) 
- * dari lingkungan tempat aplikasi ini dijalankan.
+ * Host diperbarui ke IP 103.219.251.163 sesuai instruksi whitelist.
  */
 const dbConfig = {
-    host: process.env.DB_HOST || '195.88.211.130',
+    host: process.env.DB_HOST || '103.219.251.163',
     user: process.env.DB_USER || 'maudigic_gg',
     password: process.env.DB_PASSWORD || 'B4ru123456_',
     database: process.env.DB_DATABASE || 'maudigic_buku_induk_siswa',
@@ -19,8 +18,8 @@ const dbConfig = {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    connectTimeout: 30000, // Menambah timeout ke 30 detik
-    enableKeepAlive: true, // Menjaga koneksi tetap hidup
+    connectTimeout: 30000,
+    enableKeepAlive: true,
     keepAliveInitialDelay: 10000,
 };
 

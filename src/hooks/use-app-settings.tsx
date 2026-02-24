@@ -1,8 +1,8 @@
 
 'use client';
-import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
-import type { AppSettings } from '@/lib/actions';
-import { getAppSettings, saveAppSettings } from '@/lib/actions';
+import { createContext, useContext, useState, useEffect } from 'react';
+import type { AppSettings } from '../lib/actions';
+import { getAppSettings, saveAppSettings } from '../lib/actions';
 
 interface AppSettingsContextType {
   settings: AppSettings | null;
@@ -11,10 +11,9 @@ interface AppSettingsContextType {
 }
 
 const AppSettingsContext = createContext<AppSettingsContextType | undefined>(undefined);
-
 const SETTINGS_STORAGE_KEY = 'eduarchive_app_settings';
 
-export function AppSettingsProvider({ children }: { children: ReactNode }) {
+export function AppSettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettingsState] = useState<AppSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -22,16 +21,11 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
     async function loadSettings() {
       setLoading(true);
       try {
-        const storedSettings = localStorage.getItem(SETTINGS_STORAGE_KEY);
-        if (storedSettings) {
-          setSettingsState(JSON.parse(storedSettings));
-        }
-        
-        const freshSettings = await getAppSettings();
-        setSettingsState(freshSettings);
-        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(freshSettings));
-      } catch (error) {
-        console.error("Failed to load app settings", error);
+        const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+        if (stored) setSettingsState(JSON.parse(stored));
+        const fresh = await getAppSettings();
+        setSettingsState(fresh);
+        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(fresh));
       } finally {
         setLoading(false);
       }
@@ -49,10 +43,8 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   };
 
-  const value = { settings, loading, setSettings: handleSetSettings };
-
   return (
-    <AppSettingsContext.Provider value={value}>
+    <AppSettingsContext.Provider value={{ settings, loading, setSettings: handleSetSettings }}>
       {children}
     </AppSettingsContext.Provider>
   );
@@ -60,8 +52,6 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
 
 export function useAppSettings() {
   const context = useContext(AppSettingsContext);
-  if (context === undefined) {
-    throw new Error('useAppSettings must be used within an AppSettingsProvider');
-  }
+  if (!context) throw new Error('useAppSettings must be used within AppSettingsProvider');
   return context;
 }

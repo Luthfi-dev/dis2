@@ -2,7 +2,7 @@
 'use server';
 import 'server-only';
 import pool from './db';
-import bcrypt from 'bcryptjs'; // Menggunakan bcryptjs agar stabil di semua lingkungan
+import bcrypt from 'bcryptjs';
 
 export type User = {
   id: string;
@@ -28,7 +28,6 @@ export async function loginAction(email: string, pass: string): Promise<{ succes
             return { success: false, error: 'Akun Anda telah diblokir.' };
         }
         
-        // Verifikasi password menggunakan bcryptjs
         const isPasswordValid = await bcrypt.compare(pass, user.password);
         if (!isPasswordValid) {
             return { success: false, error: 'Email atau password salah.' };
@@ -40,7 +39,7 @@ export async function loginAction(email: string, pass: string): Promise<{ succes
 
     } catch (error: any) {
         console.error('Login Error:', error);
-        return { success: false, error: 'Terjadi kesalahan pada server saat mencoba login.' };
+        return { success: false, error: 'Terjadi kesalahan pada server.' };
     } finally {
         db.release();
     }
@@ -112,32 +111,24 @@ export async function saveUser(user: Partial<User> & { id?: string }): Promise<{
             const { id, ...updateData } = user;
             if (Object.keys(updateData).length === 0) {
                  await db.commit();
-                 return { success: true, message: 'Tidak ada perubahan untuk disimpan.' };
+                 return { success: true, message: 'Tidak ada perubahan.' };
             }
             const fields = Object.keys(updateData).map(key => `${key} = ?`).join(', ');
             const values = Object.values(updateData);
             await db.query(`UPDATE users SET ${fields} WHERE id = ?`, [...values, id]);
             await db.commit();
-            return { success: true, message: 'Pengguna berhasil diperbarui.' };
+            return { success: true, message: 'Pengguna diperbarui.' };
         } else {
-            if (!user.password) {
-                await db.rollback();
-                return { success: false, message: 'Password wajib diisi untuk pengguna baru.' };
-            }
             const fields = Object.keys(user).filter(k => k !== 'id');
             const placeholders = fields.map(() => '?').join(', ');
             const values = fields.map(k => (user as any)[k]);
             await db.query(`INSERT INTO users (${fields.join(', ')}) VALUES (${placeholders})`, values);
             await db.commit();
-            return { success: true, message: 'Pengguna berhasil ditambahkan.' };
+            return { success: true, message: 'Pengguna ditambahkan.' };
         }
     } catch (error: any) {
         await db.rollback();
-        console.error("Error saving user:", error);
-        if (error.code === 'ER_DUP_ENTRY') {
-            return { success: false, message: 'Email sudah terdaftar.' };
-        }
-        return { success: false, message: `Gagal menyimpan pengguna: ${error.message}` };
+        return { success: false, message: `Error: ${error.message}` };
     } finally {
         db.release();
     }
@@ -146,32 +137,20 @@ export async function saveUser(user: Partial<User> & { id?: string }): Promise<{
 export async function deleteUser(id: string): Promise<{ success: boolean; message: string }> {
     const db = await pool.getConnection();
     try {
-        await db.beginTransaction();
         const [result]: any = await db.query('DELETE FROM users WHERE id = ?', [id]);
-        await db.commit();
-        if (result.affectedRows > 0) {
-            return { success: true, message: 'Pengguna berhasil dihapus.' };
-        }
-        return { success: false, message: 'Pengguna tidak ditemukan.' };
-    } catch (error: any) {
-        await db.rollback();
-        console.error("Error deleting user:", error);
-        return { success: false, message: `Gagal menghapus pengguna: ${error.message}` };
+        return result.affectedRows > 0 
+            ? { success: true, message: 'Pengguna dihapus.' }
+            : { success: false, message: 'Gagal.' };
     } finally {
         db.release();
     }
 }
 
 export async function generateHash(password: string): Promise<{ success: boolean, hash?: string, error?: string }> {
-    if (!password) {
-        return { success: false, error: 'Password tidak boleh kosong.' };
-    }
     try {
-        const saltRounds = 10;
-        const hash = await bcrypt.hash(password, saltRounds);
+        const hash = await bcrypt.hash(password, 10);
         return { success: true, hash };
     } catch(error: any) {
-        console.error("Error generating hash:", error);
-        return { success: false, error: `Gagal membuat hash: ${error.message}` };
+        return { success: false, error: error.message };
     }
 }
