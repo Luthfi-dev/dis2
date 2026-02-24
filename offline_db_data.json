@@ -43,9 +43,55 @@
         "fileURL": "https://picsum.photos/seed/101/200/200"
       },
       "documents": {
-        "kartuKeluarga": { "fileName": "KK_Ahmad.pdf", "fileURL": "#" },
-        "ijazah": { "fileName": "Ijazah_SD_Ahmad.pdf", "fileURL": "#" }
+        "kartuKeluarga": {
+          "fileName": "KK_Ahmad.pdf",
+          "fileURL": "#"
+        },
+        "ijazah": {
+          "fileName": "Ijazah_SD_Ahmad.pdf",
+          "fileURL": "#"
+        }
       }
+    },
+    {
+      "id": "1771918119093",
+      "siswa_namaLengkap": "Risna Dilfa",
+      "siswa_nis": "123456",
+      "siswa_nisn": "0012345678",
+      "siswa_jenisKelamin": "Perempuan",
+      "siswa_tempatLahir": "JAKARTA",
+      "siswa_tanggalLahir": "2026-02-08",
+      "siswa_agama": "Islam",
+      "siswa_kewarganegaraan": "WNI",
+      "siswa_fotoProfil": {
+        "fileName": "Screenshot_20260223-140317.jpg",
+        "fileURL": "/uploads/siswa/1771917986701.jpg"
+      },
+      "siswa_jumlahSaudara": 2,
+      "siswa_bahasa": "Indonesia",
+      "siswa_golonganDarah": "A",
+      "siswa_telepon": "0821 6764 9251",
+      "siswa_alamatKkProvinsi": "11",
+      "siswa_alamatKkKabupaten": "1111",
+      "siswa_alamatKkKecamatan": "1111010",
+      "siswa_alamatKkDesa": "1111010001",
+      "siswa_domisiliProvinsi": "32",
+      "siswa_domisiliKabupaten": "3273",
+      "siswa_domisiliKecamatan": "3273010",
+      "siswa_domisiliDesa": "3273010001",
+      "siswa_tinggiBadan": 165,
+      "siswa_beratBadan": 60,
+      "siswa_penyakit": "-",
+      "siswa_kelainanJasmani": "Tidak Ada",
+      "documents": {
+        "kartuKeluarga": {
+          "fileName": "promo berakhir 22 Februari 2026.pdf",
+          "fileURL": "/uploads/siswa/1771918083615.pdf"
+        }
+      },
+      "siswa_namaAyah": "Ayates",
+      "siswa_namaIbu": "Ibutes",
+      "status": "Lengkap"
     }
   ],
   "pegawai": [
@@ -68,18 +114,33 @@
       "status": "Lengkap",
       "pegawai_pendidikanS1": {
         "tamatTahun": "1998",
-        "ijazah": { "fileName": "ijazah_s1_mulyadi.pdf", "fileURL": "#" }
+        "ijazah": {
+          "fileName": "ijazah_s1_mulyadi.pdf",
+          "fileURL": "#"
+        }
       },
       "pegawai_phaspoto": {
         "fileName": "mulyadi.jpg",
         "fileURL": "https://picsum.photos/seed/201/300/400"
       },
       "pegawai_skPengangkatan": [
-        { "fileName": "SK_CPNS_2000.pdf", "fileURL": "#" },
-        { "fileName": "SK_PNS_2001.pdf", "fileURL": "#" }
+        {
+          "fileName": "SK_CPNS_2000.pdf",
+          "fileURL": "#"
+        },
+        {
+          "fileName": "SK_PNS_2001.pdf",
+          "fileURL": "#"
+        }
       ],
-      "pegawai_ktp": { "fileName": "KTP_Mulyadi.jpg", "fileURL": "#" },
-      "pegawai_kartuKeluarga": { "fileName": "KK_Mulyadi.pdf", "fileURL": "#" }
+      "pegawai_ktp": {
+        "fileName": "KTP_Mulyadi.jpg",
+        "fileURL": "#"
+      },
+      "pegawai_kartuKeluarga": {
+        "fileName": "KK_Mulyadi.pdf",
+        "fileURL": "#"
+      }
     }
   ],
   "users": [
@@ -109,19 +170,49 @@
     }
   ],
   "provinsi": [
-    { "id": "11", "name": "ACEH" },
-    { "id": "32", "name": "JAWA BARAT" }
+    {
+      "id": "11",
+      "name": "ACEH"
+    },
+    {
+      "id": "32",
+      "name": "JAWA BARAT"
+    }
   ],
   "kabupaten": [
-    { "id": "1111", "name": "KABUPATEN BIREUEN", "province_id": "11" },
-    { "id": "3273", "name": "KOTA BANDUNG", "province_id": "32" }
+    {
+      "id": "1111",
+      "name": "KABUPATEN BIREUEN",
+      "province_id": "11"
+    },
+    {
+      "id": "3273",
+      "name": "KOTA BANDUNG",
+      "province_id": "32"
+    }
   ],
   "kecamatan": [
-    { "id": "1111010", "name": "KOTA JUANG", "regency_id": "1111" },
-    { "id": "3273010", "name": "ANDIR", "regency_id": "3273" }
+    {
+      "id": "1111010",
+      "name": "KOTA JUANG",
+      "regency_id": "1111"
+    },
+    {
+      "id": "3273010",
+      "name": "ANDIR",
+      "regency_id": "3273"
+    }
   ],
   "desa": [
-    { "id": "1111010001", "name": "BANDAR BIREUEN", "district_id": "1111010" },
-    { "id": "3273010001", "name": "CAMPAKA", "district_id": "3273010" }
+    {
+      "id": "1111010001",
+      "name": "BANDAR BIREUEN",
+      "district_id": "1111010"
+    },
+    {
+      "id": "3273010001",
+      "name": "CAMPAKA",
+      "district_id": "3273010"
+    }
   ]
 }
