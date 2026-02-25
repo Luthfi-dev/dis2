@@ -25,7 +25,8 @@ function InfoRow({ label, value, icon, className }: { label: string, value?: Rea
     );
 }
 
-function PendidikanRow({ level, data }: { level: string, data?: { tamatTahun?: string, ijazah?: { fileName?: string }}}) {
+function PendidikanRow({ level, data }: { level: string, data?: any }) {
+    if (!data) return null;
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 p-4 bg-muted/50 rounded-lg">
             <InfoRow label="Tingkat" value={level} icon={GraduationCap} />
@@ -59,25 +60,27 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
   const [alamat, setAlamat] = useState({kabupaten: '', kecamatan: '', desa: ''});
 
   useEffect(() => {
+    let isMounted = true;
     const fetchPegawai = async () => {
         try {
             const result = await getPegawaiById(id);
-            if(result) {
+            if(result && isMounted) {
                 setPegawai(result);
                 const [kabName, kecName, desaName] = await Promise.all([
                     getKabupatenName(result.pegawai_alamatKabupaten),
                     getKecamatanName(result.pegawai_alamatKecamatan),
                     getDesaName(result.pegawai_alamatDesa)
                 ]);
-                setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
+                if(isMounted) setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
             }
         } catch (error) {
             console.error("Fetch data failed", error);
         } finally {
-            setLoading(false);
+            if(isMounted) setLoading(false);
         }
     };
     fetchPegawai();
+    return () => { isMounted = false; };
   }, [id]);
 
   if (loading) {
@@ -151,13 +154,12 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
                         <InfoRow label="Nama Lengkap" value={pegawai.pegawai_nama} icon={User} />
                         <InfoRow label="Jenis Kelamin" value={pegawai.pegawai_jenisKelamin} icon={Users} />
-                        <InfoRow label="Tempat, Tgl Lahir" value={`${pegawai.pegawai_tempatLahir}, ${formatDate(pegawai.pegawai_tanggalLahir)}`} icon={Calendar} />
+                        <InfoRow label="Tempat, Tgl Lahir" value={`${pegawai.pegawai_tempatLahir || ''}, ${formatDate(pegawai.pegawai_tanggalLahir)}`} icon={Calendar} />
                         <InfoRow label="NIP" value={pegawai.pegawai_nip} icon={FileText} />
                         <InfoRow label="NUPTK" value={pegawai.pegawai_nuptk} icon={FileText} />
                         <InfoRow label="NRG" value={pegawai.pegawai_nrg} icon={FileText} />
                         <InfoRow label="Jabatan" value={pegawai.pegawai_jabatan} icon={Briefcase}/>
                         <InfoRow label="Bidang Studi" value={pegawai.pegawai_bidangStudi} icon={School}/>
-                        <InfoRow label="Tugas Tambahan" value={pegawai.pegawai_tugasTambahan} icon={Briefcase}/>
                         <InfoRow label="TMT" value={formatDate(pegawai.pegawai_terhitungMulaiTanggal)} icon={Calendar}/>
                     </div>
                 </section>
