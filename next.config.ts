@@ -27,13 +27,8 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  experimental: {
-    workerThreads: true,
-    cpus: 2,
-  },
-
   webpack: (config, { dev }) => {
-    // MEMATIKAN CACHE FILESYSTEM UNTUK MENCEGAH DISK FULL (ENOSPC)
+    // MEMATIKAN CACHE FILESYSTEM UNTUK MENCEGAH DISK FULL (ENOSPC / QUOTA EXCEEDED)
     // Ini memastikan tidak ada sampah cache yang ditulis ke disk saat build
     if (!dev) {
       config.cache = false;

@@ -30,6 +30,7 @@ export async function POST(request: NextRequest) {
 
     if (file.type.startsWith('image/')) {
         // MATIKAN CACHE DISK SHARP - WAJIB UNTUK MENCEGAH SAMPAH DI ROOT/HOME
+        // Memaksa sharp berjalan di memori sepenuhnya
         sharp.cache(false); 
         
         await sharp(buffer)
