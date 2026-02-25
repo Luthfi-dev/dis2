@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { join, extname } from 'path';
 import sharp from 'sharp';
 
-// Folder uploads diletakkan di luar proyek agar mudah dikelola dev
+// Folder uploads berada di luar direktori proyek untuk kemudahan manajemen dev
 const UPLOADS_DIR = join(process.cwd(), '..', 'uploads');
 
 export async function POST(request: NextRequest) {
@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
 
     if (isImage) {
         // MATIKAN CACHE DISK SHARP UNTUK MENCEGAH PENULISAN FILE SAMPAH DI ROOT/HOME
+        // Sharp akan memproses di memori sepenuhnya
         sharp.cache(false); 
         
         fileBufferToSave = await sharp(buffer)
@@ -43,6 +44,7 @@ export async function POST(request: NextRequest) {
             .toBuffer();
     }
     
+    // Tulis file langsung ke folder target eksternal
     await writeFile(path, fileBufferToSave);
     
     const url = `/uploads/${directory ? `${directory}/` : ''}${filename}`;

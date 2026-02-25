@@ -1,16 +1,16 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  // output: 'standalone', // Dinonaktifkan sesuai permintaan user
+  // Menonaktifkan standalone sesuai permintaan user
+  output: undefined,
   
   poweredByHeader: false,
-  
   compress: true,
 
+  // Pastikan validasi dilakukan saat build untuk keamanan kode
   typescript: {
     ignoreBuildErrors: false,
   },
-  
   eslint: {
     ignoreDuringBuilds: false,
   },
@@ -28,12 +28,14 @@ const nextConfig: NextConfig = {
   },
 
   experimental: {
+    // Membatasi penggunaan resource agar tidak overload di hosting
     workerThreads: true,
     cpus: 2,
   },
 
   webpack: (config, { dev, isServer }) => {
-    // Mematikan cache filesystem untuk menghindari error ENOSPC (disk full) pada hosting terbatas
+    // SOLUSI KRITIS: Matikan cache filesystem Webpack untuk mencegah ENOSPC (Disk Full)
+    // Ini akan membuat build sedikit lebih lambat tapi menjamin tidak ada sampah cache di root/home
     if (!dev) {
       config.cache = false;
     }
