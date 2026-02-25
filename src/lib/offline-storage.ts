@@ -114,7 +114,6 @@ class OfflineStorage {
             }
             if (upperSql.includes('FROM APP_SETTINGS')) return this.cachedData!.app_settings;
             
-            // Handle Wilayah Selects
             if (upperSql.includes('FROM PROVINSI')) {
                 if (upperSql.includes('WHERE ID = ?')) return this.cachedData!.provinsi.filter(p => p.id === params[0]);
                 return this.cachedData!.provinsi;

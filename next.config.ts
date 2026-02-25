@@ -1,13 +1,11 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  // Menonaktifkan standalone sesuai permintaan user
   output: undefined,
   
   poweredByHeader: false,
   compress: true,
 
-  // MENGABAIKAN LINTING DAN TYPE CHECK SAAT BUILD UNTUK KELANCARAN DEPLOYMENT
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -28,8 +26,6 @@ const nextConfig: NextConfig = {
   },
 
   webpack: (config, { dev }) => {
-    // MEMATIKAN CACHE FILESYSTEM UNTUK MENCEGAH DISK FULL (ENOSPC / QUOTA EXCEEDED)
-    // Ini memastikan tidak ada sampah cache yang ditulis ke disk saat build
     if (!dev) {
       config.cache = false;
     }
