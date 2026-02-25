@@ -64,6 +64,7 @@ export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ type: string }> }
 ) {
+    // Next.js 15: params must be awaited
     const { type } = await params;
 
     let headers: any[] = [];

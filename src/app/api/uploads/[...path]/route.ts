@@ -10,7 +10,7 @@ export async function GET(
   req: NextRequest,
   {params}: {params: Promise<{path: string[]}>}
 ) {
-  // Next.js 15: params must be awaited
+  // Next.js 15: params must be awaited to comply with type validity
   const { path: pathSegments } = await params;
   
   // Sanitasi path untuk mencegah directory traversal

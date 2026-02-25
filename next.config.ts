@@ -1,7 +1,7 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  // Menonaktifkan standalone sesuai permintaan user
+  // Menonaktifkan standalone sesuai permintaan user untuk stabilitas di hosting tertentu
   output: undefined,
   
   poweredByHeader: false,
@@ -33,9 +33,9 @@ const nextConfig: NextConfig = {
     cpus: 2,
   },
 
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config, { dev }) => {
     // SOLUSI KRITIS: Matikan cache filesystem Webpack untuk mencegah ENOSPC (Disk Full)
-    // Ini akan membuat build sedikit lebih lambat tapi menjamin tidak ada sampah cache di root/home
+    // Ini menjamin tidak ada sampah cache yang ditulis ke root/home
     if (!dev) {
       config.cache = false;
     }

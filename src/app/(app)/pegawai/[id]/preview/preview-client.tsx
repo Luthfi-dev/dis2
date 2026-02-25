@@ -22,7 +22,7 @@ function InfoRow({ label, value, icon, className }: { label: string, value?: Rea
             <span className="mr-2">:</span>
             <span className="flex-1 break-words">{value || '-'}</span>
         </div>
-    )
+    );
 }
 
 function PendidikanRow({ level, data }: { level: string, data?: { tamatTahun?: string, ijazah?: { fileName?: string }}}) {
@@ -32,7 +32,7 @@ function PendidikanRow({ level, data }: { level: string, data?: { tamatTahun?: s
             <InfoRow label="Tamat Tahun" value={data?.tamatTahun} icon={Calendar} />
             <InfoRow label="Ijazah" value={data?.ijazah?.fileName || 'Tidak ada'} icon={FileText} />
         </div>
-    )
+    );
 }
 
 function FileRow({ label, document, isMulti = false }: { label: string, document?: any, isMulti?: boolean }) {
@@ -52,7 +52,6 @@ function FileRow({ label, document, isMulti = false }: { label: string, document
 
     return <InfoRow label={label} value={value} icon={FileText} />;
 }
-
 
 export function PreviewPegawaiClient({ id }: { id: string }) {
   const [pegawai, setPegawai] = useState<Pegawai | null>(null);
@@ -76,7 +75,6 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
     fetchPegawai();
   }, [id]);
 
-
   if (loading) {
       return (
           <div className="bg-muted/30 p-4 md:p-8">
@@ -88,7 +86,7 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
                   <Skeleton className="h-[800px] w-full" />
               </div>
           </div>
-      )
+      );
   }
 
   if (!pegawai) {
@@ -98,7 +96,7 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
   const formatDate = (dateString?: string | Date) => {
       if (!dateString) return '-';
       return new Date(dateString).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
-  }
+  };
   
   const pegawaiStatus = pegawai.status === 'Lengkap';
 
@@ -120,11 +118,10 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
         </div>
 
         <main className="p-6 sm:p-10">
-            {/* Header */}
             <header className="flex flex-col sm:flex-row items-center gap-6 mb-8 text-center sm:text-left">
                 {pegawai.pegawai_phaspoto?.fileURL ? (
                     <div className="relative w-32 h-40 border-4 border-primary/20 shadow-lg overflow-hidden rounded-lg">
-                        <Image src={pegawai.pegawai_phaspoto.fileURL} alt="Foto Pegawai" fill className="object-cover" />
+                        <Image src={pegawai.pegawai_phaspoto.fileURL} alt="Foto" fill className="object-cover" />
                     </div>
                 ) : (
                     <div className="w-32 h-40 rounded-lg bg-muted flex items-center justify-center border-4 border-primary/20 shadow-lg">
