@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { join, extname } from 'path';
 import sharp from 'sharp';
 
-// Folder uploads berada di luar direktori proyek (../uploads)
+// Folder uploads tetap di luar direktori proyek (../uploads) agar aman bagi dev
 const UPLOADS_DIR = join(process.cwd(), '..', 'uploads');
 
 export async function POST(request: NextRequest) {
@@ -25,12 +25,11 @@ export async function POST(request: NextRequest) {
     const filename = `${Date.now()}${fileExtension}`;
     const path = join(targetDir, filename);
 
-    // Pastikan folder tersedia
+    // Buat folder di ../ jika belum ada
     await mkdir(targetDir, { recursive: true });
 
     if (file.type.startsWith('image/')) {
-        // MATIKAN CACHE DISK SHARP UNTUK MENCEGAH PENULISAN FILE SAMPAH DI ROOT/HOME
-        // Sharp akan memproses sepenuhnya di memori
+        // MATIKAN CACHE DISK SHARP - WAJIB UNTUK MENCEGAH SAMPAH DI ROOT/HOME
         sharp.cache(false); 
         
         await sharp(buffer)
