@@ -42,7 +42,7 @@ function FileRow({ label, document, isMulti = false }: { label: string, document
         value = (
             <ul className="list-disc list-inside space-y-1">
                 {document.map((doc: any, index: number) => (
-                    <li key={index} className="truncate">{doc.fileName || 'Dokumen'}</li>
+                    <li key={index} className="truncate">{doc?.fileName || 'Dokumen'}</li>
                 ))}
             </ul>
         );
@@ -60,17 +60,22 @@ export function PreviewPegawaiClient({ id }: { id: string }) {
 
   useEffect(() => {
     const fetchPegawai = async () => {
-        const result = await getPegawaiById(id);
-        if(result) {
-            setPegawai(result);
-            const [kabName, kecName, desaName] = await Promise.all([
-                getKabupatenName(result.pegawai_alamatKabupaten),
-                getKecamatanName(result.pegawai_alamatKecamatan),
-                getDesaName(result.pegawai_alamatDesa)
-            ]);
-            setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
+        try {
+            const result = await getPegawaiById(id);
+            if(result) {
+                setPegawai(result);
+                const [kabName, kecName, desaName] = await Promise.all([
+                    getKabupatenName(result.pegawai_alamatKabupaten),
+                    getKecamatanName(result.pegawai_alamatKecamatan),
+                    getDesaName(result.pegawai_alamatDesa)
+                ]);
+                setAlamat({kabupaten: kabName, kecamatan: kecName, desa: desaName});
+            }
+        } catch (error) {
+            console.error("Fetch data failed", error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
     fetchPegawai();
   }, [id]);
