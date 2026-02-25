@@ -1,4 +1,3 @@
-
 'use client';
 import { getSiswaById } from '@/lib/actions';
 import { Siswa } from '@/lib/data';
@@ -33,11 +32,11 @@ export function PreviewSiswaClient({ id }: { id: string }) {
   const [domisili, setDomisili] = useState({provinsi: '', kabupaten: '', kecamatan: '', desa: ''});
 
   useEffect(() => {
+    let isMounted = true;
     const fetchStudent = async () => {
         const result = await getSiswaById(id);
-        if (result) {
+        if (result && isMounted) {
             setStudent(result);
-            // Fetch wilayah names
             const [kkProv, kkKab, kkKec, kkDes, domProv, domKab, domKec, domDes] = await Promise.all([
                 getProvinceName(result.siswa_alamatKkProvinsi),
                 getKabupatenName(result.siswa_alamatKkKabupaten),
@@ -48,12 +47,15 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                 getKecamatanName(result.siswa_domisiliKecamatan),
                 getDesaName(result.siswa_domisiliDesa),
             ]);
-            setAlamatKk({provinsi: kkProv, kabupaten: kkKab, kecamatan: kkKec, desa: kkDes});
-            setDomisili({provinsi: domProv, kabupaten: domKab, kecamatan: domKec, desa: domDes});
+            if(isMounted) {
+                setAlamatKk({provinsi: kkProv, kabupaten: kkKab, kecamatan: kkKec, desa: kkDes});
+                setDomisili({provinsi: domProv, kabupaten: domKab, kecamatan: domKec, desa: domDes});
+            }
         }
-        setLoading(false);
+        if(isMounted) setLoading(false);
     };
     fetchStudent();
+    return () => { isMounted = false; };
   }, [id]);
 
 
@@ -100,7 +102,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
         </div>
 
         <main className="p-6 sm:p-10">
-            {/* Header */}
             <header className="flex flex-col sm:flex-row items-center gap-6 mb-8 text-center sm:text-left">
                 {student.siswa_fotoProfil?.fileURL ? (
                     <Image src={student.siswa_fotoProfil.fileURL} alt="Foto Siswa" width={128} height={128} className="rounded-full border-4 border-primary/20 shadow-lg object-cover w-32 h-32" />
@@ -122,7 +123,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
             <Separator className="my-8" />
             
             <div className="space-y-10">
-                {/* Keterangan Pribadi */}
                 <section>
                     <h3 className="font-bold text-xl mb-4 border-b-2 border-primary pb-2 text-primary">A. Keterangan Pribadi Siswa</h3>
                     <div className="space-y-3">
@@ -140,7 +140,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                     </div>
                 </section>
                 
-                {/* Keterangan Tempat Tinggal */}
                  <section>
                     <h3 className="font-bold text-xl mb-4 border-b-2 border-primary pb-2 text-primary">B. Keterangan Tempat Tinggal</h3>
                     <div className="space-y-4">
@@ -161,7 +160,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                     </div>
                 </section>
 
-                {/* Keterangan Kesehatan */}
                 <section>
                     <h3 className="font-bold text-xl mb-4 border-b-2 border-primary pb-2 text-primary">C. Keterangan Kesehatan</h3>
                     <div className="space-y-3">
@@ -171,7 +169,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                     </div>
                 </section>
 
-                {/* Keterangan Orang Tua */}
                  <section>
                     <h3 className="font-bold text-xl mb-4 border-b-2 border-primary pb-2 text-primary">D. Keterangan Orang Tua</h3>
                     <div className="space-y-4">
@@ -190,7 +187,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                     </div>
                 </section>
 
-                 {/* Keterangan Wali */}
                  <section>
                     <h3 className="font-bold text-xl mb-4 border-b-2 border-primary pb-2 text-primary">E. Keterangan Wali</h3>
                     <div className="space-y-3">
@@ -201,7 +197,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                     </div>
                 </section>
 
-                {/* Perkembangan Siswa */}
                 <section>
                     <h3 className="font-bold text-xl mb-4 border-b-2 border-primary pb-2 text-primary">F. Perkembangan Siswa</h3>
                      <div className="space-y-4">
@@ -220,7 +215,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                     </div>
                 </section>
                 
-                {/* Meninggalkan Sekolah */}
                 <section>
                     <h3 className="font-bold text-xl mb-4 border-b-2 border-primary pb-2 text-primary">G. Meninggalkan Sekolah</h3>
                      <div className="space-y-4">
@@ -243,7 +237,6 @@ export function PreviewSiswaClient({ id }: { id: string }) {
                         </div>
                     </div>
                 </section>
-
             </div>
         </main>
       </div>

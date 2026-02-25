@@ -1,6 +1,9 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+/**
+ * Penyimpanan database offline menggunakan file JSON di root.
+ */
 const STORAGE_PATH = path.join(process.cwd(), 'offline_db_data.json');
 const SQL_LOG_PATH = path.join(process.cwd(), 'local_audit_log.sql');
 

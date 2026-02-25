@@ -3,35 +3,49 @@ import path from 'path';
 import fs from 'fs';
 import mime from 'mime';
 
-// Folder uploads berada di luar direktori proyek (../uploads)
 const UPLOADS_DIR = path.join(process.cwd(), '..', 'uploads');
+
+/**
+ * Menggunakan ReadableStream untuk mengirim file (Streaming).
+ * Ini jauh lebih hemat memori dibanding readFileSync/readFile.
+ */
+function nodeStreamToWeb(nodeStream: fs.ReadStream) {
+  return new ReadableStream({
+    start(controller) {
+      nodeStream.on('data', (chunk) => controller.enqueue(chunk));
+      nodeStream.on('end', () => controller.close());
+      nodeStream.on('error', (err) => controller.error(err));
+    },
+    cancel() {
+      nodeStream.destroy();
+    },
+  });
+}
 
 export async function GET(
   req: NextRequest,
   {params}: {params: Promise<{path: string[]}>}
 ) {
-  // Next.js 15: params must be awaited to comply with type validity
   const { path: pathSegments } = await params;
-  
-  // Sanitasi path untuk mencegah directory traversal
   const safePath = pathSegments.filter(segment => !segment.includes('..'));
   const filePath = path.join(UPLOADS_DIR, ...safePath);
 
   try {
-    await fs.promises.access(filePath, fs.constants.F_OK);
+    const stats = await fs.promises.stat(filePath);
+    if (!stats.isFile()) return new NextResponse('Not found', {status: 404});
+
+    const mimeType = mime.getType(filePath) || 'application/octet-stream';
+    const fileStream = fs.createReadStream(filePath);
+
+    return new NextResponse(nodeStreamToWeb(fileStream), {
+      status: 200,
+      headers: {
+        'Content-Type': mimeType,
+        'Content-Length': stats.size.toString(),
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
+    });
   } catch (e) {
     return new NextResponse('File not found', {status: 404});
   }
-
-  const fileContents = await fs.promises.readFile(filePath);
-  const mimeType = mime.getType(filePath) || 'application/octet-stream';
-
-  return new NextResponse(fileContents, {
-    status: 200,
-    headers: {
-      'Content-Type': mimeType,
-      'Content-Length': fileContents.length.toString(),
-      'Cache-Control': 'public, max-age=31536000, immutable',
-    },
-  });
 }

@@ -26,6 +26,7 @@ const nextConfig: NextConfig = {
   },
 
   webpack: (config, { dev }) => {
+    // Matikan cache filesystem secara total untuk mencegah disk penuh (ENOSPC)
     if (!dev) {
       config.cache = false;
     }
