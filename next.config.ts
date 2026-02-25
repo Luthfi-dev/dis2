@@ -1,7 +1,7 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  // Menonaktifkan standalone sesuai permintaan user untuk stabilitas di hosting tertentu
+  // Menonaktifkan standalone sesuai permintaan user
   output: undefined,
   
   poweredByHeader: false,

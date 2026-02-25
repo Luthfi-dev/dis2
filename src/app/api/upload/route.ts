@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { join, extname } from 'path';
 import sharp from 'sharp';
 
-// Folder uploads berada di luar direktori proyek (../uploads) sesuai keinginan user
+// Folder uploads berada di luar direktori proyek (../uploads)
 const UPLOADS_DIR = join(process.cwd(), '..', 'uploads');
 
 export async function POST(request: NextRequest) {
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     if (file.type.startsWith('image/')) {
         // MATIKAN CACHE DISK SHARP UNTUK MENCEGAH PENULISAN FILE SAMPAH DI ROOT/HOME
-        // Sharp akan memproses sepenuhnya di memori sebelum menulis ke file target
+        // Sharp akan memproses sepenuhnya di memori
         sharp.cache(false); 
         
         await sharp(buffer)
